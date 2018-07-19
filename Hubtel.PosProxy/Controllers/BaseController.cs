@@ -8,9 +8,11 @@ using System.Threading.Tasks;
 
 namespace Hubtel.PosProxy.Controllers
 {
+    [Produces("application/json")]
+    [Route("api/[controller]")]
     public class BaseController : ControllerBase
     {
-        public async Task<IActionResult> ActionResultAsync(HttpResponseMessage httpResponseMessage)
+        protected async Task<IActionResult> ActionResultAsync(HttpResponseMessage httpResponseMessage)
         {
             switch (httpResponseMessage.StatusCode)
             {

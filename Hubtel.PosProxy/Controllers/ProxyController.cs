@@ -13,7 +13,7 @@ using Microsoft.Extensions.Primitives;
 
 namespace Hubtel.PosProxy.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/proxy")]
     [ApiController]
     public class ProxyController : BaseController
     {
@@ -26,7 +26,7 @@ namespace Hubtel.PosProxy.Controllers
             _logger = logger;
         }
 
-        [HttpPost]
+        [HttpPost, Route("")]
         public async Task<IActionResult> RelayRequest([FromBody] ProxyRequest proxyRequest)
         {
             var schemeToken = RequestHeaderHelper.GetSchemeAndToken(Request);
