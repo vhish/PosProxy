@@ -16,6 +16,7 @@ namespace Hubtel.PosProxyData.EntityModels
         public string MomoToken { get; set; }
         public string Description { get; set; }
 
+        public string TransactionSession { get; set; }
         public string TransactionId { get; set; }
         public string ExternalTransactionId { get; set; }
         public decimal AmountAfterCharges { get; set; }

@@ -25,6 +25,11 @@ using Swashbuckle.AspNetCore.Filters;
 using Swashbuckle.AspNetCore.Swagger;
 using Microsoft.EntityFrameworkCore;
 using Hubtel.PosProxyData.Repositories;
+using Hubtel.PosProxy.Authentication;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json.Serialization;
+using FluentValidation.AspNetCore;
 
 namespace Hubtel.PosProxy
 {
@@ -92,7 +97,16 @@ namespace Hubtel.PosProxy
                 options.SerializerSettings.Formatting = Formatting.Indented;
             }); ;
 
-            services.AddMvcCore().AddApiExplorer();
+            services.AddMvcCore(options =>
+            {
+                // My custom auth All endpoints need authentication
+                options.Filters.Add(new AuthorizeFilter(new AuthorizationPolicyBuilder().RequireAuthenticatedUser()
+                    .Build()));
+            })
+            .AddAuthorization()
+            .AddJsonFormatters(b => b.ContractResolver = new DefaultContractResolver())
+            .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<DtoToEntityMappingProfile>())
+            .AddApiExplorer();
 
             services.AddSwaggerGen(c =>
             {
@@ -100,7 +114,7 @@ namespace Hubtel.PosProxy
                 c.OperationFilter<AuthorizationInputOperationFilter>();
             });
 
-            var issuer = Configuration.GetValue<string>("HubtelAuth:Issuer");
+            /*var issuer = Configuration.GetValue<string>("HubtelAuth:Issuer");
             var audience = Configuration.GetValue<string>("HubtelAuth:Audience");
             var key = Configuration.GetValue<string>("HubtelAuth:Key");
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
@@ -116,6 +130,15 @@ namespace Hubtel.PosProxy
                     ValidAudience = audience,
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
                 };
+            });*/
+            services.AddAuthentication(options =>
+            {
+                options.DefaultAuthenticateScheme = CustomAuthOptions.DefaultScheme;
+                options.DefaultChallengeScheme = CustomAuthOptions.DefaultScheme;
+            }).AddCustomAuth(options =>
+            {
+                // Configure single or multiple passwords for authentication
+                options.AuthKey = "custom auth key";
             });
         }
 

@@ -14,7 +14,7 @@ namespace Hubtel.PosProxyData.Repositories
         {
         }
 
-        public async Task SetToSuccessfulAsync(string clientReference)
+        /*public async Task SetToSuccessfulAsync(string clientReference)
         {
             var sql = $"UPDATE PaymentRequests SET Status = '{En.PaymentStatus.SUCCESSFUL}' WHERE " +
                 $"ClientReference = '{clientReference}'";
@@ -26,12 +26,12 @@ namespace Hubtel.PosProxyData.Repositories
             var sql = $"UPDATE PaymentRequests SET Status = '{En.PaymentStatus.FAILED}' WHERE " +
                 $"ClientReference = '{clientReference}'";
             await ExecuteSqlCommandAsync(sql);
-        }
+        }*/
     }
 
     public interface IPaymentRequestRepository : IBaseRepository<PaymentRequest>
     {
-        Task SetToSuccessfulAsync(string clientReference);
-        Task SetToFailedAsync(string clientReference);
+        //Task SetToSuccessfulAsync(string clientReference);
+        //Task SetToFailedAsync(string clientReference);
     }
 }

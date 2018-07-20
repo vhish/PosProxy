@@ -8,16 +8,14 @@ namespace Hubtel.PosProxy.Models
     public class UnifiedSalesConfiguration : IUnifiedSalesConfiguration
     {
         public string BaseUrl { get; set; }
-        public string ClientId { get; set; }
-        public string ClientSecret { get; set; }
+        public string ApiKey { get; set; }
         public string Scheme { get; set; }
     }
 
     public interface IUnifiedSalesConfiguration
     {
         string BaseUrl { get; set; }
-        string ClientId { get; set; }
-        string ClientSecret { get; set; }
+        string ApiKey { get; set; }
         string Scheme { get; set; }
     }
 }

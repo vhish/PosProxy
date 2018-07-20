@@ -46,8 +46,9 @@ namespace Hubtel.PosProxy.Controllers
             var paymentRequest = _mapper.Map<PaymentRequest>(payload);
             paymentRequest = await _paymentRequestRepository.AddAsync(paymentRequest).ConfigureAwait(false);
 
-            var paymentTypeClassName = $"{caseFormat.ToTitleCase(payload.PaymentType)}PaymentService";
-            var paymentService = (IPaymentService)ActivatorUtilities.CreateInstance(_provider, Type.GetType(paymentTypeClassName));
+            var paymentTypeClassName = $"{caseFormat.ToTitleCase(payload.PaymentType.ToLower())}PaymentService";
+            var r = Type.GetType(paymentTypeClassName);
+            var paymentService = (PaymentService)ActivatorUtilities.CreateInstance(_provider, Type.GetType(paymentTypeClassName));
             if (await paymentService.ProcessPaymentAsync(paymentRequest).ConfigureAwait(false))
             {
                 return Ok();
