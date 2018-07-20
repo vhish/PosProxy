@@ -1,6 +1,8 @@
 ﻿using Hubtel.PosProxy.Helpers;
 using Hubtel.PosProxy.Lib;
 using Hubtel.PosProxy.Models;
+using Hubtel.PosProxy.Models.Requests;
+using Hubtel.PosProxy.Models.Responses;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
@@ -24,7 +26,7 @@ namespace Hubtel.PosProxy.Services
             _logger = logger;
         }
 
-        public async Task<OrderPaymentResponse> RecordPayment(OrderPaymentRequest orderPaymentRequest)
+        public async Task<OrderPaymentResponse> RecordPaymentAsync(OrderPaymentRequest orderPaymentRequest)
         {
             var url = $"{_unifiedSalesConfiguration.BaseUrl}";
 
@@ -49,6 +51,6 @@ namespace Hubtel.PosProxy.Services
 
     public interface IUnifiedSalesService
     {
-        Task<OrderPaymentResponse> RecordPayment(OrderPaymentRequest orderPaymentRequest);
+        Task<OrderPaymentResponse> RecordPaymentAsync(OrderPaymentRequest orderPaymentRequest);
     }
 }

@@ -14,7 +14,12 @@ namespace Hubtel.PosProxy.Services
             throw new NotImplementedException();
         }
 
-        public override bool ProcessPayment(PaymentRequest paymentRequest)
+        public override async Task<bool> ProcessPaymentAsync(PaymentRequest paymentRequest)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override Task<bool> RecordPaymentAsync(PaymentRequest paymentRequest)
         {
             throw new NotImplementedException();
         }

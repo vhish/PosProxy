@@ -13,21 +13,34 @@ namespace Hubtel.PosProxy.Models.Dtos
         public string PaymentType { get; set; }
         public decimal Amount { get; set; }
         public string SalesOrderId { get; set; }
-        public string CustomerName { get; set; }
-        public string CustomerMsisdn { get; set; }
-        public string CustomerEmail { get; set; }
-        public string Channel { get; set; }
-        public string ChannelToken { get; set; }
+        public string MomoPhoneNumber { get; set; }
+        public string MomoChannel { get; set; }
+        public string MomoToken { get; set; }
+        public bool? CustomerPaysFee { get; set; }
+        public DateTime? PaymentDate { get; set; }
+        public string Note { get; set; }
+        public string PosDevice { get; set; }
+
+        public CustomerDto Customer { get; set; }
         public EmployeeDto Employee { get; set; }
         public BranchDto Branch { get; set; }
     }
 
+    [Validator(typeof(CustomerValidator))]
+    public class CustomerDto
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+    }
+
+    [Validator(typeof(BranchValidator))]
     public class BranchDto
     {
         public string BranchId { get; set; }
         public string Name { get; set; }
     }
 
+    [Validator(typeof(EmployeeValidator))]
     public class EmployeeDto
     {
         public string EmployeeId { get; set; }

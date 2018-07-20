@@ -10,13 +10,14 @@ namespace Hubtel.PosProxy.Services
     public abstract class PaymentService : IPaymentService
     {
         public abstract bool CheckStatus();
-        public abstract bool ProcessPayment(PaymentRequest paymentRequest);
-        
+        public abstract Task<bool> ProcessPaymentAsync(PaymentRequest paymentRequest);
+        public abstract Task<bool> RecordPaymentAsync(PaymentRequest paymentRequest);
     }
 
     public interface IPaymentService
     {
-        bool ProcessPayment(PaymentRequest paymentRequest);
+        Task<bool> ProcessPaymentAsync(PaymentRequest paymentRequest);
+        Task<bool> RecordPaymentAsync(PaymentRequest paymentRequest);
         bool CheckStatus();
     }
 }

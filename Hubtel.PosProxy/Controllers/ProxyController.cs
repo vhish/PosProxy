@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using Hubtel.PosProxy.Helpers;
 using Hubtel.PosProxy.Lib;
 using Hubtel.PosProxy.Models;
+using Hubtel.PosProxy.Models.Requests;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;

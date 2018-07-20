@@ -11,6 +11,10 @@ namespace Hubtel.PosProxy.Models
         public string PrivateBaseUrl { get; set; }
         public string ApiKey { get; set; }
         public string Scheme { get; set; }
+        public string MomoPrimaryCallbackUrl { get; set; }
+        public string MomoSecondaryCallbackUrl { get; set; }
+        public string CardPrimaryCallbackUrl { get; set; }
+        public string CardSecondaryCallbackUrl { get; set; }
     }
 
     public interface IMerchantAccountConfiguration
@@ -19,5 +23,9 @@ namespace Hubtel.PosProxy.Models
         string PrivateBaseUrl { get; set; }
         string ApiKey { get; set; }
         string Scheme { get; set; }
+        string MomoPrimaryCallbackUrl { get; set; }
+        string MomoSecondaryCallbackUrl { get; set; }
+        string CardPrimaryCallbackUrl { get; set; }
+        string CardSecondaryCallbackUrl { get; set; }
     }
 }

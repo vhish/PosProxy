@@ -33,15 +33,24 @@ namespace Hubtel.PosProxy
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
+            //Redis = ConnectionMultiplexer.Connect(Configuration["Redis:ConnectionString"]);
         }
 
         public IConfiguration Configuration { get; }
+        //public static ConnectionMultiplexer Redis;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddLogging();
             services.AddCors();
+
+            services.AddDistributedMemoryCache();
+            /*services.AddDistributedRedisCache(option =>
+            {
+                option.Configuration = Configuration["Redis:ConnectionString"];
+                option.InstanceName = Configuration["Redis:InstanceName"];
+            });*/
 
             string migrationsAssembly = "Hubtel.PosProxyData";
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
@@ -70,10 +79,12 @@ namespace Hubtel.PosProxy
             services.AddSingleton<IProxyHttpClient, ProxyHttpClient>();
             services.AddSingleton<IMerchantAccountHttpClient, MerchantAccountHttpClient>();
             services.AddSingleton<IUnifiedSalesHttpClient, UnifiedSalesHttpClient>();
-            services.AddTransient<IPaymentServiceFactory, PaymentServiceFactory>();
             services.AddTransient<ICashPaymentService, CashPaymentService>();
             services.AddTransient<ICardPaymentService, CardPaymentService>();
             services.AddTransient<IMomoPaymentService, MomoPaymentService>();
+            //services.AddTransient<IPaymentService, PaymentService>();
+            services.AddTransient<IUnifiedSalesService, UnifiedSalesService>();
+            services.AddTransient<IMerchantAccountService, MerchantAccountService>();
             services.AddTransient<IPaymentRequestRepository, PaymentRequestRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(options =>
@@ -89,9 +100,9 @@ namespace Hubtel.PosProxy
                 c.OperationFilter<AuthorizationInputOperationFilter>();
             });
 
-            var issuer = Configuration.GetValue<string>("Issuer");
-            var audience = Configuration.GetValue<string>("Audience");
-            var key = Configuration.GetValue<string>("Key");
+            var issuer = Configuration.GetValue<string>("HubtelAuth:Issuer");
+            var audience = Configuration.GetValue<string>("HubtelAuth:Audience");
+            var key = Configuration.GetValue<string>("HubtelAuth:Key");
             services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
             .AddJwtBearer(options =>
             {

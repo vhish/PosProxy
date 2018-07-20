@@ -39,6 +39,10 @@ namespace Hubtel.PosProxyData.Core
             // For example, you can rename the ASP.NET Identity table names and more.
             // Add your customizations after calling base.OnModelCreating(builder);
 
+            builder.Entity<PaymentRequest>()
+                .HasIndex(b => b.ClientReference)
+                .IsUnique();
+
             foreach (var property in builder.Model.GetEntityTypes()
                 .SelectMany(t => t.GetProperties())
                 .Where(p => p.ClrType == typeof(decimal)))
@@ -72,7 +76,7 @@ namespace Hubtel.PosProxyData.Core
             var accountId = GetAccountId();
             var currentAccountId = !string.IsNullOrEmpty(user) ? user : "Anonymous";
             var currentUsername = !string.IsNullOrEmpty(user) ? user : "Anonymous";
-            var currentUserid = !string.IsNullOrEmpty(userId) ? userId : "Unknown";
+            //var currentUserid = !string.IsNullOrEmpty(userId) ? userId : "Unknown";
 
             var entries = ChangeTracker.Entries().Where(x => x.Entity is BaseEntity && (x.State == EntityState.Added || x.State == EntityState.Modified));
             foreach (var entry in entries)
@@ -95,9 +99,8 @@ namespace Hubtel.PosProxyData.Core
             {
                 var user = HttpContextAccessor.HttpContext.User;
                 var claimsIdentity = (ClaimsIdentity)user.Identity;
-                //var claim = claimsIdentity.FindFirst(JwtClaimTypes.GivenName);
-                //return claim?.Value;
-                return null;
+                var claim = claimsIdentity.FindFirst(ClaimTypes.Name);
+                return claim?.Value;
             }
             return null;
         }
@@ -108,9 +111,8 @@ namespace Hubtel.PosProxyData.Core
             {
                 var user = HttpContextAccessor.HttpContext.User;
                 var claimsIdentity = (ClaimsIdentity)user.Identity;
-                //var claim = claimsIdentity.FindFirst(JwtClaimTypes.Id);
-                //return claim?.Value;
-                return null;
+                var claim = claimsIdentity.FindFirst(ClaimTypes.MobilePhone);
+                return claim?.Value;
             }
             return null;
         }
@@ -121,9 +123,8 @@ namespace Hubtel.PosProxyData.Core
             {
                 var user = HttpContextAccessor.HttpContext.User;
                 var claimsIdentity = (ClaimsIdentity)user.Identity;
-                //var claim = claimsIdentity.FindFirst(JwtClaimTypes.Id);
-                //return claim?.Value;
-                return null;
+                var claim = claimsIdentity.FindFirst(ClaimTypes.Sid);
+                return claim?.Value;
             }
             return null;
         }
