@@ -28,11 +28,11 @@ namespace Hubtel.PosProxy.Services
 
         public async Task<OrderPaymentResponse> RecordPaymentAsync(OrderPaymentRequest orderPaymentRequest, string accountId)
         {
-            var url = $"{_unifiedSalesConfiguration.BaseUrl}";
+            var url = $"{_unifiedSalesConfiguration.BaseUrl}/invoice/{orderPaymentRequest.SalesOrderId}/payment";
 
             var authToken = HubtelBasicAuthHelper.GenerateToken(_unifiedSalesConfiguration.ApiKey, accountId);
 
-            using (var response = await _unifiedSalesHttpClient.PostAsync(url, orderPaymentRequest, "Basic", authToken))
+            using (var response = await _unifiedSalesHttpClient.PostAsync(url, orderPaymentRequest, _unifiedSalesConfiguration.Scheme, authToken))
             {
                 var respData = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
@@ -43,6 +43,7 @@ namespace Hubtel.PosProxy.Services
                     return result;
                 }
                 _logger.LogError(response.ReasonPhrase);
+                _logger.LogError(respData);
             }
             return new OrderPaymentResponse();
         }

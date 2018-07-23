@@ -8,7 +8,7 @@ namespace Hubtel.PosProxyData.Constants
     {
         public class PaymentStatus
         {
-            public static string SUCCESSFUL = "Successful";
+            public static string SUCCESSFUL = "Success";
             public static string FAILED = "Failed";
             public static string PENDING = "Pending";
         }

@@ -30,12 +30,13 @@ namespace Hubtel.PosProxy.Controllers
 
         public PaymentsController(ICardPaymentService cardPaymentService,
             IMomoPaymentService momoPaymentService, IMapper mapper,
-            IPaymentRequestRepository paymentRequestRepository)
+            IPaymentRequestRepository paymentRequestRepository, IServiceProvider provider)
         {
             _mapper = mapper;
             _paymentRequestRepository = paymentRequestRepository;
             _cardPaymentService = cardPaymentService;
             _momoPaymentService = momoPaymentService;
+            _provider = provider;
         }
 
         [HttpPost, Route("")]
@@ -46,7 +47,7 @@ namespace Hubtel.PosProxy.Controllers
             var paymentRequest = _mapper.Map<PaymentRequest>(payload);
             paymentRequest = await _paymentRequestRepository.AddAsync(paymentRequest).ConfigureAwait(false);
 
-            var paymentTypeClassName = $"{caseFormat.ToTitleCase(payload.PaymentType.ToLower())}PaymentService";
+            var paymentTypeClassName = $"Hubtel.PosProxy.Services.{caseFormat.ToTitleCase(payload.PaymentType.ToLower())}PaymentService";
             var r = Type.GetType(paymentTypeClassName);
             var paymentService = (PaymentService)ActivatorUtilities.CreateInstance(_provider, Type.GetType(paymentTypeClassName));
             if (await paymentService.ProcessPaymentAsync(paymentRequest).ConfigureAwait(false))

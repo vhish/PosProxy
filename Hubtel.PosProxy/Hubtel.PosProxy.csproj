@@ -16,12 +16,13 @@
     <PackageReference Include="Akka" Version="1.3.8" />
     <PackageReference Include="Akka.Remote" Version="1.3.8" />
     <PackageReference Include="AutoMapper.Collection" Version="4.0.0" />
-    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.0" />
+    <PackageReference Include="AutoMapper.Extensions.Microsoft.DependencyInjection" Version="5.0.1" />
     <PackageReference Include="FluentValidation.AspNetCore" Version="7.6.104" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="2.1.1" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="2.1.1" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="3.0.0" />
     <PackageReference Include="Swashbuckle.AspNetCore.Filters" Version="3.0.4" />
@@ -30,6 +31,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hubtel.PosProxyData\Hubtel.PosProxyData.csproj" />
+    <ProjectReference Include="..\Hubtel.PosProxyZip\Hubtel.PosProxyZip.csproj" />
   </ItemGroup>
 
 </Project>

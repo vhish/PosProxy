@@ -14,6 +14,7 @@ namespace Hubtel.PosProxyData.Core
     {
         protected IHttpContextAccessor HttpContextAccessor;
         public DbSet<PaymentRequest> PaymentRequests { get; set; }
+        public DbSet<SalesOrderZipFile> SalesOrderZipFiles { get; set; }
 
         public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
             : base(options)

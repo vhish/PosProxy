@@ -20,16 +20,16 @@ namespace Hubtel.PosProxy.Services
         private readonly IHttpContextAccessor _httpContextAccessor;
 
         public CashPaymentService(IUnifiedSalesService unifiedSalesService, IHttpContextAccessor httpContextAccessor,
-            IPaymentRequestRepository paymentRequestRepository)
+            IPaymentRequestRepository paymentRequestRepository) : base(unifiedSalesService, paymentRequestRepository)
         {
             _unifiedSalesService = unifiedSalesService;
             _paymentRequestRepository = paymentRequestRepository;
             _httpContextAccessor = httpContextAccessor;
         }
 
-        public override bool CheckStatus()
+        public override async Task<bool> CheckStatusAsync(PaymentRequest paymentRequest)
         {
-            throw new NotImplementedException();
+            return true;
         }
 
         public override async Task<bool> ProcessPaymentAsync(PaymentRequest paymentRequest)
@@ -40,17 +40,21 @@ namespace Hubtel.PosProxy.Services
             return true;
         }
 
-        public override async Task<bool> RecordPaymentAsync(PaymentRequest paymentRequest)
+        /*public override async Task<bool> RecordPaymentAsync(PaymentRequest paymentRequest)
         {
-            var user = _httpContextAccessor.HttpContext.User;
-            var accountId = UserHelper.GetAccountId(user);
+            //var user = _httpContextAccessor.HttpContext.User;
+            //var accountId = UserHelper.GetAccountId(user);
+            var accountId = paymentRequest.AccountId;
 
             var orderPaymentRequest = OrderPaymentRequest.ToOrderPaymentRequest(paymentRequest);
             var response = await _unifiedSalesService.RecordPaymentAsync(orderPaymentRequest, accountId).ConfigureAwait(false);
-            paymentRequest = await _paymentRequestRepository.UpdateAsync(paymentRequest, paymentRequest.Id).ConfigureAwait(false);
-
-            return true;
-        }
+            if(response != null)
+            {
+                paymentRequest = await _paymentRequestRepository.UpdateAsync(paymentRequest, paymentRequest.Id).ConfigureAwait(false);
+                return true;
+            }
+            return false;
+        }*/
     }
 
     public interface ICashPaymentService : IPaymentService

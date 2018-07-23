@@ -5,7 +5,9 @@ VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hubtel.PosProxy", "Hubtel.PosProxy\Hubtel.PosProxy.csproj", "{317561DB-150A-4A83-82E4-8289123DD1C4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hubtel.PosProxyData", "Hubtel.PosProxyData\Hubtel.PosProxyData.csproj", "{B2206080-ECDE-43A4-A7E9-C3FB51DC944D}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Hubtel.PosProxyData", "Hubtel.PosProxyData\Hubtel.PosProxyData.csproj", "{B2206080-ECDE-43A4-A7E9-C3FB51DC944D}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hubtel.PosProxyZip", "Hubtel.PosProxyZip\Hubtel.PosProxyZip.csproj", "{9420FC1C-974F-4344-B5D7-25A0CCF8A90E}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{B2206080-ECDE-43A4-A7E9-C3FB51DC944D}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{B2206080-ECDE-43A4-A7E9-C3FB51DC944D}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{B2206080-ECDE-43A4-A7E9-C3FB51DC944D}.Release|Any CPU.Build.0 = Release|Any CPU
+		{9420FC1C-974F-4344-B5D7-25A0CCF8A90E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9420FC1C-974F-4344-B5D7-25A0CCF8A90E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9420FC1C-974F-4344-B5D7-25A0CCF8A90E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9420FC1C-974F-4344-B5D7-25A0CCF8A90E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

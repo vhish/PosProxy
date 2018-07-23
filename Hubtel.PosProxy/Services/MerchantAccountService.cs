@@ -35,14 +35,14 @@ namespace Hubtel.PosProxy.Services
                 .SetSlidingExpiration(TimeSpan.FromMinutes(3600));
         }
 
-        public async Task<string> FindAccountNumberAsync(string accountId)
+        private async Task<string> FindAccountNumberAsync(string accountId)
         {
             //first search cache if not found go to api
             var accountNumber = await _cache.GetStringAsync(accountId).ConfigureAwait(false);
             if (string.IsNullOrEmpty(accountNumber))
             {
                 var response = await SearchAsync(accountId).ConfigureAwait(false);
-                if(response != null)
+                if(response.Data != null)
                 {
                     accountNumber = response.Data.AccountNumber;
                     await _cache.SetStringAsync(accountId, accountNumber, _cacheOptions).ConfigureAwait(false);
@@ -57,7 +57,7 @@ namespace Hubtel.PosProxy.Services
 
             var authToken = HubtelBasicAuthHelper.GenerateToken(_merchantAccountConfiguration.ApiKey, accountId);
 
-            using (var response = await _merchantAccountHttpClient.GetAsync(url, "Basic", authToken))
+            using (var response = await _merchantAccountHttpClient.GetAsync(url, _merchantAccountConfiguration.Scheme, authToken))
             {
                 var respData = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
@@ -72,9 +72,9 @@ namespace Hubtel.PosProxy.Services
             return new MerchantAccountNumberResponse();
         }
         
-        public async Task<MerchantMomoResponse> ChargeMomoAsync(string merchantAccountNumber, 
-            PaymentRequest paymentRequest, string accountId)
+        public async Task<MerchantMomoResponse> ChargeMomoAsync(PaymentRequest paymentRequest, string accountId)
         {
+            string merchantAccountNumber = await FindAccountNumberAsync(accountId).ConfigureAwait(false);
             var url = $"{_merchantAccountConfiguration.PrivateBaseUrl}/merchants/{merchantAccountNumber}/receive/mobilemoney";
 
             var authToken = HubtelBasicAuthHelper.GenerateToken(_merchantAccountConfiguration.ApiKey, accountId);
@@ -99,9 +99,9 @@ namespace Hubtel.PosProxy.Services
             return new MerchantMomoResponse();
         }
 
-        public async Task<MerchantCardResponse> ChargeCardAsync(string merchantAccountNumber, 
-            PaymentRequest paymentRequest, string accountId)
+        public async Task<MerchantCardResponse> ChargeCardAsync(PaymentRequest paymentRequest, string accountId)
         {
+            string merchantAccountNumber = await FindAccountNumberAsync(accountId).ConfigureAwait(false);
             var url = $"{_merchantAccountConfiguration.PrivateBaseUrl}/merchants/{merchantAccountNumber}/receive/payworks";
 
             var authToken = HubtelBasicAuthHelper.GenerateToken(_merchantAccountConfiguration.ApiKey, accountId);
@@ -126,9 +126,9 @@ namespace Hubtel.PosProxy.Services
             return new MerchantCardResponse();
         }
 
-        public async Task<MomoFeeResponse> GetMomoFeesAsync(string merchantAccountNumber, 
-            PaymentRequest paymentRequest, string accountId)
+        public async Task<MomoFeeResponse> GetMomoFeesAsync(PaymentRequest paymentRequest, string accountId)
         {
+            string merchantAccountNumber = await FindAccountNumberAsync(accountId).ConfigureAwait(false);
             var url = $"{_merchantAccountConfiguration.PrivateBaseUrl}/merchants/{merchantAccountNumber}/charges/mobile/receive";
 
             var authToken = HubtelBasicAuthHelper.GenerateToken(_merchantAccountConfiguration.ApiKey, accountId);
@@ -175,14 +175,37 @@ namespace Hubtel.PosProxy.Services
             }
             return new MomoChannelResponse();
         }
+
+        public async Task<MerchantTransactionCheckResponse> CheckTransactionStatusAsync(PaymentRequest paymentRequest, string accountId)
+        {
+            string merchantAccountNumber = await FindAccountNumberAsync(accountId).ConfigureAwait(false);
+            var url = $"{_merchantAccountConfiguration.PublicBaseUrl}/merchants/{merchantAccountNumber}/transactions/status?" +
+                $"hubtelTransactionId={paymentRequest.TransactionId}";
+
+            var authToken = HubtelBasicAuthHelper.GenerateToken(_merchantAccountConfiguration.ApiKey, accountId);
+
+            using (var response = await _merchantAccountHttpClient.GetAsync(url, "Basic", authToken))
+            {
+                var respData = await response.Content.ReadAsStringAsync();
+                if (response.IsSuccessStatusCode)
+                {
+                    var result = JsonConvert.DeserializeObject<MerchantTransactionCheckResponse>(respData);
+
+                    _logger.LogDebug(respData);
+                    return result;
+                }
+                _logger.LogError(response.ReasonPhrase);
+            }
+            return new MerchantTransactionCheckResponse();
+        }
     }
 
     public interface IMerchantAccountService
     {
-        Task<string> FindAccountNumberAsync(string accountId);
-        Task<MerchantMomoResponse> ChargeMomoAsync(string merchantAccountNumber, PaymentRequest paymentRequest, string accountId);
-        Task<MerchantCardResponse> ChargeCardAsync(string merchantAccountNumber, PaymentRequest paymentRequest, string accountId);
-        Task<MomoFeeResponse> GetMomoFeesAsync(string merchantAccountNumber, PaymentRequest paymentRequest, string accountId);
+        Task<MerchantMomoResponse> ChargeMomoAsync(PaymentRequest paymentRequest, string accountId);
+        Task<MerchantCardResponse> ChargeCardAsync(PaymentRequest paymentRequest, string accountId);
+        Task<MomoFeeResponse> GetMomoFeesAsync(PaymentRequest paymentRequest, string accountId);
         Task<MomoChannelResponse> GetChannelsAsync(string accountId);
+        Task<MerchantTransactionCheckResponse> CheckTransactionStatusAsync(PaymentRequest paymentRequest, string accountId);
     }
 }

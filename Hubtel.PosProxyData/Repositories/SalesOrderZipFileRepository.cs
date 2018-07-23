@@ -8,15 +8,15 @@ using System.Threading.Tasks;
 
 namespace Hubtel.PosProxyData.Repositories
 {
-    public class PaymentRequestRepository : BaseRepository<PaymentRequest>, IPaymentRequestRepository
+    public class SalesOrderZipFileRepository : BaseRepository<SalesOrderZipFile>, ISalesOrderZipFileRepository
     {
-        public PaymentRequestRepository(ApplicationDbContext context) : base(context)
+        public SalesOrderZipFileRepository(ApplicationDbContext context) : base(context)
         {
         }
         
     }
 
-    public interface IPaymentRequestRepository : IBaseRepository<PaymentRequest>
+    public interface ISalesOrderZipFileRepository : IBaseRepository<SalesOrderZipFile>
     {
         
     }

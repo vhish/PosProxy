@@ -24,7 +24,7 @@ namespace Hubtel.PosProxy.Services
 
         public CardPaymentService(IMerchantAccountService merchantAccountService,
             IPaymentRequestRepository paymentRequestRepository, IUnifiedSalesService unifiedSalesService,
-            ILogger<CardPaymentService> logger)
+            ILogger<CardPaymentService> logger) : base(unifiedSalesService, paymentRequestRepository)
         {
             _merchantAccountService = merchantAccountService;
             _paymentRequestRepository = paymentRequestRepository;
@@ -32,18 +32,26 @@ namespace Hubtel.PosProxy.Services
             _logger = logger;
         }
 
-        public override bool CheckStatus()
+        public override async Task<bool> CheckStatusAsync(PaymentRequest paymentRequest)
         {
-            throw new NotImplementedException();
+            var accountId = paymentRequest.AccountId;
+            var response = await _merchantAccountService.CheckTransactionStatusAsync(paymentRequest, accountId).ConfigureAwait(false);
+            if (response != null)
+            {
+                paymentRequest.Status = response.Status ? En.PaymentStatus.SUCCESSFUL : En.PaymentStatus.FAILED;
+                await RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                return true;
+            }
+            return false;
         }
 
         public override async Task<bool> ProcessPaymentAsync(PaymentRequest paymentRequest)
         {
-            var user = _httpContextAccessor.HttpContext.User;
-            var accountId = UserHelper.GetAccountId(user);
+            //var user = _httpContextAccessor.HttpContext.User;
+            //var accountId = UserHelper.GetAccountId(user);
+            var accountId = paymentRequest.AccountId;
 
-            var accountNumber = await _merchantAccountService.FindAccountNumberAsync(accountId).ConfigureAwait(false);
-            var response = await _merchantAccountService.ChargeCardAsync(accountNumber, paymentRequest, accountId).ConfigureAwait(false);
+            var response = await _merchantAccountService.ChargeCardAsync(paymentRequest, accountId).ConfigureAwait(false);
 
             if (response != null && response.Equals(ResponseCodes.PAYMENT_REQUEST_SUCCESSFUL))
             {
@@ -59,10 +67,11 @@ namespace Hubtel.PosProxy.Services
             return false;
         }
 
-        public override async Task<bool> RecordPaymentAsync(PaymentRequest paymentRequest)
+        /*public override async Task<bool> RecordPaymentAsync(PaymentRequest paymentRequest)
         {
-            var user = _httpContextAccessor.HttpContext.User;
-            var accountId = UserHelper.GetAccountId(user);
+            //var user = _httpContextAccessor.HttpContext.User;
+            //var accountId = UserHelper.GetAccountId(user);
+            var accountId = paymentRequest.AccountId;
 
             var orderPaymentRequest = OrderPaymentRequest.ToOrderPaymentRequest(paymentRequest);
             var response = await _unifiedSalesService.RecordPaymentAsync(orderPaymentRequest, accountId).ConfigureAwait(false);
@@ -70,7 +79,7 @@ namespace Hubtel.PosProxy.Services
             paymentRequest = await _paymentRequestRepository.UpdateAsync(paymentRequest, paymentRequest.Id).ConfigureAwait(false);
 
             return true;
-        }
+        }*/
     }
 
     public interface ICardPaymentService : IPaymentService

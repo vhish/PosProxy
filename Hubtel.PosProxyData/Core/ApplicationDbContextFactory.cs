@@ -12,7 +12,7 @@ namespace Hubtel.PosProxyData.Core
         {
             var builder = new DbContextOptionsBuilder<ApplicationDbContext>();
             builder.UseSqlServer(
-                "Data Source=tcp:localhost\\SQLEXPRESS,1433;Database=HPosProxy;User Id=hubtelpos;Password=hubtelpos;MultipleActiveResultSets=true;",
+                "Server=localhost\\SQLEXPRESS;Database=HPosProxy;Trusted_Connection=True;MultipleActiveResultSets=true;",
                 sql => sql.MigrationsAssembly("Hubtel.PosProxyData"));
 
             return new ApplicationDbContext(builder.Options);

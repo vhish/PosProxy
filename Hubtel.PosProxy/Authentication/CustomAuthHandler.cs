@@ -74,9 +74,9 @@ namespace Hubtel.PosProxy.Authentication
             // Create authenticated user
             var claims = new List<Claim>
             {
-                new Claim("Name", hubtelProfile.MobileNumber),
-                new Claim("AccountId", hubtelProfile.AccountId),
-                new Claim("Phone", hubtelProfile.MobileNumber)
+                new Claim(ClaimTypes.Name, hubtelProfile.MobileNumber),
+                new Claim(ClaimTypes.Sid, hubtelProfile.AccountId),
+                new Claim(ClaimTypes.MobilePhone, hubtelProfile.MobileNumber)
             };
 
             var identities = new List<ClaimsIdentity>

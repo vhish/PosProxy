@@ -30,6 +30,7 @@ using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Serialization;
 using FluentValidation.AspNetCore;
+using Hubtel.PosProxy.BackgroundServices;
 
 namespace Hubtel.PosProxy
 {
@@ -38,11 +39,9 @@ namespace Hubtel.PosProxy
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
-            //Redis = ConnectionMultiplexer.Connect(Configuration["Redis:ConnectionString"]);
         }
 
         public IConfiguration Configuration { get; }
-        //public static ConnectionMultiplexer Redis;
 
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
@@ -74,6 +73,10 @@ namespace Hubtel.PosProxy
             services.AddSingleton(mapper);
             services.AddAutoMapper();
 
+            //services.AddSingleton<IHostedService, PaymentStatusCheckService>();
+            services.AddHostedService<ConsumeScopedServiceHostedService>();
+            services.AddScoped<IScopedProcessingService, ScopedProcessingService>();
+
             services.AddSingleton<IMerchantAccountConfiguration>(Configuration.GetSection("MerchantAccountConfiguration")
                 .Get<MerchantAccountConfiguration>());
             services.AddSingleton<IUnifiedSalesConfiguration>(Configuration.GetSection("UnifiedSalesConfiguration")
@@ -87,10 +90,11 @@ namespace Hubtel.PosProxy
             services.AddTransient<ICashPaymentService, CashPaymentService>();
             services.AddTransient<ICardPaymentService, CardPaymentService>();
             services.AddTransient<IMomoPaymentService, MomoPaymentService>();
-            //services.AddTransient<IPaymentService, PaymentService>();
+            services.AddTransient<ISalesOrderZipFileService, SalesOrderZipFileService>();
             services.AddTransient<IUnifiedSalesService, UnifiedSalesService>();
             services.AddTransient<IMerchantAccountService, MerchantAccountService>();
             services.AddTransient<IPaymentRequestRepository, PaymentRequestRepository>();
+            services.AddTransient<ISalesOrderZipFileRepository, SalesOrderZipFileRepository>();
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(options =>
             {
@@ -112,6 +116,7 @@ namespace Hubtel.PosProxy
             {
                 c.SwaggerDoc("v1", new Info { Title = "POS Proxy API", Version = "v1" });
                 c.OperationFilter<AuthorizationInputOperationFilter>();
+                c.OperationFilter<AddFileParamTypesOperationFilter>();
             });
 
             /*var issuer = Configuration.GetValue<string>("HubtelAuth:Issuer");

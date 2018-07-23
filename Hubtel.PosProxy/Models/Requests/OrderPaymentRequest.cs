@@ -10,6 +10,7 @@ namespace Hubtel.PosProxy.Models.Requests
 {
     public class OrderPaymentRequest
     {
+        public string SalesOrderId { get; set; }
         public string MerchantAccountTxId { get; set; }
         public string PaymentType { get; set; }
         public string PaymentReference { get; set; }
@@ -27,6 +28,7 @@ namespace Hubtel.PosProxy.Models.Requests
         {
             return new OrderPaymentRequest
             {
+                SalesOrderId = paymentRequest.SalesOrderId,
                 PaymentAmount = paymentRequest.Amount,
                 PaymentDate = paymentRequest.PaymentDate,
                 MerchantBearsFee = !paymentRequest.CustomerPaysFee,
