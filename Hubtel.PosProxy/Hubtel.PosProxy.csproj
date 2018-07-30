@@ -20,6 +20,7 @@
     <PackageReference Include="FluentValidation.AspNetCore" Version="7.6.104" />
     <PackageReference Include="Gelf.Extensions.Logging" Version="1.4.0" />
     <PackageReference Include="Microsoft.AspNetCore.App" />
+    <PackageReference Include="Microsoft.AspNetCore.Http" Version="2.1.1" />
     <PackageReference Include="Microsoft.AspNetCore.Razor.Language" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="2.1.1" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.SqlServer" Version="2.1.1" />
@@ -35,7 +36,6 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Hubtel.PosProxyData\Hubtel.PosProxyData.csproj" />
-    <ProjectReference Include="..\Hubtel.PosProxyZip\Hubtel.PosProxyZip.csproj" />
   </ItemGroup>
 
   <ItemGroup>
