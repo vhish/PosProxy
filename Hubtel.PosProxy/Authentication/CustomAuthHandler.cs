@@ -50,7 +50,7 @@ namespace Hubtel.PosProxy.Authentication
             var scheme = schemeToken.Key.ToLower();
             var token = schemeToken.Value;
 
-            if (scheme.Equals("hubtel-basic", StringComparison.OrdinalIgnoreCase))
+            if (scheme.Equals("hubtel-bearer", StringComparison.OrdinalIgnoreCase))
             {
                 if (ValidateClientIp(Request) && ValidateApiToken(token, out HubtelProfile hubtelProfile))
                 {
@@ -60,9 +60,9 @@ namespace Hubtel.PosProxy.Authentication
 
             if (scheme.Equals("bearer", StringComparison.OrdinalIgnoreCase))
             {
-                if (ValidateApiJwtToken(token, out HubtelProfile hubtelProfile))
+                if (ValidateApiJwtToken(token, out ClaimsPrincipal principal))
                 {
-                    return await HubtelBearerAuthenticateAsync(scheme, hubtelProfile);
+                    return await JwtAuthenticateAsync(scheme, principal);
                 }
             }
 
@@ -74,9 +74,29 @@ namespace Hubtel.PosProxy.Authentication
             // Create authenticated user
             var claims = new List<Claim>
             {
-                new Claim(ClaimTypes.Name, hubtelProfile.MobileNumber),
+                new Claim(ClaimTypes.Name, "Anonymous"),
                 new Claim(ClaimTypes.Sid, hubtelProfile.AccountId),
                 new Claim(ClaimTypes.MobilePhone, hubtelProfile.MobileNumber)
+            };
+
+            var identities = new List<ClaimsIdentity>
+            {
+                new ClaimsIdentity(claims, scheme)
+            };
+            var ticket = new AuthenticationTicket(new ClaimsPrincipal(identities), scheme);
+
+            return await Task.FromResult(AuthenticateResult.Success(ticket));
+        }
+
+        private async Task<AuthenticateResult> JwtAuthenticateAsync(string scheme, ClaimsPrincipal claimsPrincipal)
+        {
+            // Create authenticated user
+            var claims = new List<Claim>
+            {
+                new Claim(ClaimTypes.Name, claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty),
+                new Claim(ClaimTypes.Sid, claimsPrincipal.FindFirst(ClaimTypes.Sid)?.Value ?? string.Empty),
+                new Claim(ClaimTypes.Role, claimsPrincipal.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty),
+                new Claim(ClaimTypes.MobilePhone, claimsPrincipal.FindFirst(ClaimTypes.MobilePhone)?.Value ?? string.Empty)
             };
 
             var identities = new List<ClaimsIdentity>
@@ -116,14 +136,12 @@ namespace Hubtel.PosProxy.Authentication
             return false;
         }
 
-        private bool ValidateApiJwtToken(string token, out HubtelProfile hubtelProfile)
+        private bool ValidateApiJwtToken(string token, out ClaimsPrincipal principal)
         {
-            hubtelProfile = null;
-
-            var issuer = _configuration["AppSettings:HubtelAuth:Issuer"];
-            var audience = _configuration["AppSettings:HubtelAuth:Audience"];
-            var key = _configuration["AppSettings:HubtelAuth:Key"];
-
+            var issuer = _configuration["HubtelAuth:Issuer"];
+            var audience = _configuration["HubtelAuth:Audience"];
+            var key = _configuration["HubtelAuth:Key"];
+            principal = null;
             try
             {
                 var handler = new JwtSecurityTokenHandler();
@@ -138,12 +156,8 @@ namespace Hubtel.PosProxy.Authentication
                     IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(key))
                 }, out SecurityToken validatedToken);
 
-                ClaimsPrincipal principal = claimsPrincipal;
-                hubtelProfile = new HubtelProfile
-                {
-                    AccountId = claimsPrincipal.FindFirst(JwtRegisteredClaimNames.Sid)?.Value ?? string.Empty,
-                    MobileNumber = claimsPrincipal.FindFirst(ClaimTypes.MobilePhone)?.Value ?? string.Empty
-                };
+                principal = claimsPrincipal;
+                
                 return true;
             }
             catch (Exception ex)

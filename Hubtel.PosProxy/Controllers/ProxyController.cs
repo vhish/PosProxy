@@ -8,6 +8,7 @@ using Hubtel.PosProxy.Helpers;
 using Hubtel.PosProxy.Lib;
 using Hubtel.PosProxy.Models;
 using Hubtel.PosProxy.Models.Requests;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Primitives;
@@ -27,6 +28,7 @@ namespace Hubtel.PosProxy.Controllers
             _logger = logger;
         }
 
+        [AllowAnonymous]
         [HttpPost, Route("")]
         public async Task<IActionResult> RelayRequest([FromBody] ProxyRequest proxyRequest)
         {
@@ -62,6 +64,12 @@ namespace Hubtel.PosProxy.Controllers
             if (proxyRequest.Method.ToLower() == "put")
             {
                 return await _proxyHttpClient.PutAsync(proxyRequest.Url, proxyRequest.RequestBody, scheme,
+                    accessToken);
+            }
+
+            if (proxyRequest.Method.ToLower() == "patch")
+            {
+                return await _proxyHttpClient.PatchAsync(proxyRequest.Url, proxyRequest.RequestBody, scheme,
                     accessToken);
             }
 

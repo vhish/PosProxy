@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hubtel.PosProxyData.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180720193332_InitialMigration")]
+    [Migration("20180723092219_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -100,6 +100,35 @@ namespace Hubtel.PosProxyData.Migrations
                         .HasFilter("[ClientReference] IS NOT NULL");
 
                     b.ToTable("PaymentRequests");
+                });
+
+            modelBuilder.Entity("Hubtel.PosProxyData.EntityModels.SalesOrderZipFile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+
+                    b.Property<string>("AccountId");
+
+                    b.Property<string>("Bucketname");
+
+                    b.Property<DateTime>("CreatedAt");
+
+                    b.Property<string>("CreatedBy");
+
+                    b.Property<string>("Filename");
+
+                    b.Property<string>("MimeType");
+
+                    b.Property<bool>("Processed");
+
+                    b.Property<DateTime>("UpdatedAt");
+
+                    b.Property<string>("UpdatedBy");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("SalesOrderZipFiles");
                 });
 #pragma warning restore 612, 618
         }

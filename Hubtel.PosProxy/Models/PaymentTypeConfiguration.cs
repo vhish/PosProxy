@@ -22,6 +22,10 @@ namespace Hubtel.PosProxy.Models
         public string Type { get; set; }
         public string Class { get; set; }
         public bool? RequireMsisdn { get; set; }
+        public bool? CheckStatus { get; set; }
+        public string PrimaryCallbackUrl { get; set; }
+        public string SecondaryCallbackUrl { get; set; }
+        public string ApplicationAlias { get; set; }
     }
 
     public class Channel

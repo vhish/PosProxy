@@ -31,6 +31,17 @@ using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json.Serialization;
 using FluentValidation.AspNetCore;
 using Hubtel.PosProxy.BackgroundServices;
+using Hubtel.PosProxy.Models.Validators;
+using FluentValidation;
+using Microsoft.AspNetCore.Http;
+using Hubtel.PosProxy.Filters;
+using Microsoft.AspNetCore.HttpOverrides;
+using Gelf.Extensions.Logging;
+using Hubtel.PosProxy.Middlewares;
+using Microsoft.AspNetCore.Diagnostics;
+using System.Net;
+using Hubtel.PosProxy.Extensions;
+using Hubtel.PosProxy.Helpers;
 
 namespace Hubtel.PosProxy
 {
@@ -46,7 +57,14 @@ namespace Hubtel.PosProxy
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddLogging();
+            services.Configure<GelfLoggerOptions>(Configuration.GetSection("Graylog"));
+            services.PostConfigure<GelfLoggerOptions>(options =>
+                            options.AdditionalFields["machine_name"] = Environment.MachineName);
+
+            services.AddLogging(builder => builder.AddConfiguration(Configuration.GetSection("Logging"))
+                            .AddConsole()
+                            .AddDebug()
+                            .AddGelf());
             services.AddCors();
 
             services.AddDistributedMemoryCache();
@@ -73,9 +91,9 @@ namespace Hubtel.PosProxy
             services.AddSingleton(mapper);
             services.AddAutoMapper();
 
-            //services.AddSingleton<IHostedService, PaymentStatusCheckService>();
-            services.AddHostedService<ConsumeScopedServiceHostedService>();
-            services.AddScoped<IScopedProcessingService, ScopedProcessingService>();
+            services.AddScoped<IpAttributeFilter>();
+            services.AddHostedService<SetupHostedService>();
+            services.AddScoped<IPaymentStatusCheckService, PaymentStatusCheckService>();
 
             services.AddSingleton<IMerchantAccountConfiguration>(Configuration.GetSection("MerchantAccountConfiguration")
                 .Get<MerchantAccountConfiguration>());
@@ -87,19 +105,28 @@ namespace Hubtel.PosProxy
             services.AddSingleton<IProxyHttpClient, ProxyHttpClient>();
             services.AddSingleton<IMerchantAccountHttpClient, MerchantAccountHttpClient>();
             services.AddSingleton<IUnifiedSalesHttpClient, UnifiedSalesHttpClient>();
+
+            services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<ICashPaymentService, CashPaymentService>();
             services.AddTransient<ICardPaymentService, CardPaymentService>();
             services.AddTransient<IMomoPaymentService, MomoPaymentService>();
+            services.AddTransient<IHubtelMePaymentService, HubtelMePaymentService>();
             services.AddTransient<ISalesOrderZipFileService, SalesOrderZipFileService>();
             services.AddTransient<IUnifiedSalesService, UnifiedSalesService>();
             services.AddTransient<IMerchantAccountService, MerchantAccountService>();
             services.AddTransient<IPaymentRequestRepository, PaymentRequestRepository>();
             services.AddTransient<ISalesOrderZipFileRepository, SalesOrderZipFileRepository>();
 
+            //services.AddTransient<IValidator<CreatePaymentRequestDto>, PaymentRequestValidator>();
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1).AddJsonOptions(options =>
             {
                 options.SerializerSettings.Formatting = Formatting.Indented;
-            }); ;
+            })/*.AddFluentValidation(fv => {
+                fv.RegisterValidatorsFromAssemblyContaining<DtoToEntityMappingProfile>();
+                fv.RunDefaultMvcValidationAfterFluentValidationExecutes = true;
+                fv.ImplicitlyValidateChildProperties = true;
+            })*/;
 
             services.AddMvcCore(options =>
             {
@@ -109,14 +136,20 @@ namespace Hubtel.PosProxy
             })
             .AddAuthorization()
             .AddJsonFormatters(b => b.ContractResolver = new DefaultContractResolver())
-            .AddFluentValidation(fv => fv.RegisterValidatorsFromAssemblyContaining<DtoToEntityMappingProfile>())
             .AddApiExplorer();
+
+            services.Configure<ForwardedHeadersOptions>(options =>
+            {
+                options.ForwardedHeaders =
+                    ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            });
 
             services.AddSwaggerGen(c =>
             {
                 c.SwaggerDoc("v1", new Info { Title = "POS Proxy API", Version = "v1" });
                 c.OperationFilter<AuthorizationInputOperationFilter>();
                 c.OperationFilter<AddFileParamTypesOperationFilter>();
+                c.IncludeXmlComments(SwaggerConfigHelper.XmlCommentsFilePath);
             });
 
             /*var issuer = Configuration.GetValue<string>("HubtelAuth:Issuer");
@@ -150,6 +183,36 @@ namespace Hubtel.PosProxy
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
+            //app.UseForwardedHeaders();
+            app.UseForwardedHeaders(new ForwardedHeadersOptions
+            {
+                ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedFor
+            });
+
+            app.UseExceptionHandler(
+                builder =>
+                {
+                    builder.Run(
+                        async context =>
+                        {
+                            context.Response.StatusCode = (int)HttpStatusCode.InternalServerError;
+                            context.Response.Headers.Add("Access-Control-Allow-Origin", "*");
+                            context.Response.Headers.Add("Content-Type", "application/json");
+
+                            var error = context.Features.Get<IExceptionHandlerFeature>();
+                            if (error != null)
+                            {
+                                var jsonErrorResponse = new
+                                {
+                                    Error = error.Error.Message
+                                };
+                                var serializeObject = JsonConvert.SerializeObject(jsonErrorResponse);
+                                context.Response.AddApplicationError(serializeObject);
+                                await context.Response.WriteAsync(serializeObject).ConfigureAwait(false);
+                            }
+                        });
+                });
+
             app.UseCors(builder => builder
                 .AllowAnyOrigin()
                 .AllowAnyMethod()
@@ -167,13 +230,19 @@ namespace Hubtel.PosProxy
 
             //app.UseHttpsRedirection();
             app.UseAuthentication();
+            //app.UseMiddleware<LoggingMiddleware>();
             app.UseMvc();
 
-            app.UseSwagger();
+            app.UseSwagger(c=>
+            {
+                var basepath = Configuration["SwaggerBaseApiUrl"];
+                c.PreSerializeFilters.Add((swaggerDoc, httpReq) => swaggerDoc.BasePath = basepath);
+            });
 
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "POS Proxy API V1");
+                string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
+                c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", "POS Proxy API V1");
             });
         }
     }

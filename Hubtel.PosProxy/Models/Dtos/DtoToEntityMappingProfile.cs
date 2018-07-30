@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hubtel.PosProxy.Models.Requests;
 using Hubtel.PosProxyData.EntityModels;
 using System;
 using System.Collections.Generic;
@@ -11,7 +12,8 @@ namespace Hubtel.PosProxy.Models.Dtos
     {
         public DtoToEntityMappingProfile()
         {
-            //CreateMap<CreatePaymentRequestDto, CardPaymentRequest>().ReverseMap();
+            CreateMap<CreateOrderRequestDto, OrderRequest>().ReverseMap();
+
             CreateMap<CreatePaymentRequestDto, PaymentRequest>()
                 .ForMember(dest => dest.Status, conf => conf.MapFrom(src => "Pending"))
                 .ForMember(dest => dest.PaymentDate, conf => conf.MapFrom(src => src.PaymentDate ?? DateTime.Now))
@@ -19,6 +21,7 @@ namespace Hubtel.PosProxy.Models.Dtos
                 .ForMember(dest => dest.BranchId, conf => conf.MapFrom(src => src.Branch.BranchId))
                 .ForMember(dest => dest.BranchName, conf => conf.MapFrom(src => src.Branch.Name))
                 .ForMember(dest => dest.CustomerName, conf => conf.MapFrom(src => src.Customer.Name))
+                .ForMember(dest => dest.CustomerPhoneNumber, conf => conf.MapFrom(src => !string.IsNullOrEmpty(src.Customer.PhoneNumber.Trim()) ? src.Customer.PhoneNumber : src.MomoPhoneNumber))
                 .ForMember(dest => dest.CustomerEmail, conf => conf.MapFrom(src => src.Customer.Email))
                 .ForMember(dest => dest.EmployeeId, conf => conf.MapFrom(src => src.Employee.EmployeeId))
                 .ForMember(dest => dest.EmployeeName, conf => conf.MapFrom(src => src.Employee.Name))

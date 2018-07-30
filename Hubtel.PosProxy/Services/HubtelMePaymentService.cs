@@ -1,22 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using Hubtel.PosProxy.Constants;
+﻿using Hubtel.PosProxy.Constants;
 using Hubtel.PosProxy.Extensions;
-using Hubtel.PosProxy.Helpers;
-using Hubtel.PosProxy.Models;
-using Hubtel.PosProxy.Models.Requests;
 using Hubtel.PosProxyData.Constants;
-using Hubtel.PosProxyData.Core;
 using Hubtel.PosProxyData.EntityModels;
 using Hubtel.PosProxyData.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Logging;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace Hubtel.PosProxy.Services
 {
-    public class CardPaymentService : PaymentService, ICardPaymentService
+    public class HubtelMePaymentService: PaymentService, IHubtelMePaymentService
     {
         private readonly IMerchantAccountService _merchantAccountService;
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -24,20 +20,21 @@ namespace Hubtel.PosProxy.Services
         private readonly IUnifiedSalesService _unifiedSalesService;
         private readonly ILogger _logger;
 
-        public CardPaymentService(IMerchantAccountService merchantAccountService,
+        public HubtelMePaymentService(IMerchantAccountService merchantAccountService,
             IPaymentRequestRepository paymentRequestRepository, IUnifiedSalesService unifiedSalesService,
-            ILogger<CardPaymentService> logger) : base(unifiedSalesService, paymentRequestRepository)
+            ILogger<HubtelMePaymentService> logger, IHttpContextAccessor httpContextAccessor) : base(unifiedSalesService, paymentRequestRepository)
         {
             _merchantAccountService = merchantAccountService;
             _paymentRequestRepository = paymentRequestRepository;
             _unifiedSalesService = unifiedSalesService;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public override async Task<HubtelPosProxyResponse<PaymentRequest>> CheckStatusAsync(PaymentRequest paymentRequest)
         {
             var accountId = paymentRequest.AccountId;
-            var response = await _merchantAccountService.CheckTransactionStatusAsync(paymentRequest, accountId).ConfigureAwait(false);
+            var response = await _merchantAccountService.CheckHubtelMeTransactionStatusAsync(paymentRequest, accountId).ConfigureAwait(false);
             if (response != null)
             {
                 if (response.Data.Data[0].TransactionStatus.ToLower().Equals("success"))
@@ -50,7 +47,6 @@ namespace Hubtel.PosProxy.Services
                 {
                     return Responses.SuccessResponse(StatusMessage.Found, paymentRequest, ResponseCodes.SUCCESS);
                 }
-                
             }
             return Responses.ErrorResponse(response.Errors, new PaymentRequest(), response.Message, ResponseCodes.EXTERNAL_ERROR);
         }
@@ -59,24 +55,22 @@ namespace Hubtel.PosProxy.Services
         {
             var accountId = paymentRequest.AccountId;
 
-            var response = await _merchantAccountService.ChargeCardAsync(paymentRequest, accountId).ConfigureAwait(false);
+            var response = await _merchantAccountService.ChargeHubtelMeAsync(paymentRequest, accountId).ConfigureAwait(false);
 
-            if (response != null && response.Equals(ResponseCodes.PAYMENT_REQUEST_SUCCESSFUL))
+            if (response != null && response.Success && response.Data.Code.Equals(ResponseCodes.PAYMENT_REQUEST_SUCCESSFUL))
             {
-                paymentRequest.TransactionId = response.Data.Data.TransactionId;
-                paymentRequest.TransactionSession = response.Data.Data.TransactionSession.TransactionSessionId;
+                paymentRequest.TransactionId = response.Data.Data.ApplicationTransactionId;
 
                 paymentRequest = await _paymentRequestRepository.UpdateAsync(paymentRequest, paymentRequest.Id).ConfigureAwait(false);
-
-                _logger.LogDebug("Card:ProcessPayment: request succeeded.");
+                _logger.LogDebug("Momo:ProcessPayment: request succeeded.");
                 return Responses.SuccessResponse(StatusMessage.Created, paymentRequest, ResponseCodes.SUCCESS);
             }
-            _logger.LogError("Card:ProcessPayment: request failed.");
+            _logger.LogError("Momo:ProcessPayment: request failed.");
             return Responses.ErrorResponse(response.Errors, new PaymentRequest(), response.Message, ResponseCodes.EXTERNAL_ERROR);
         }
     }
 
-    public interface ICardPaymentService : IPaymentService
+    public interface IHubtelMePaymentService : IPaymentService
     {
 
     }

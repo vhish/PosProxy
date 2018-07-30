@@ -17,7 +17,8 @@ namespace Hubtel.PosProxy.Models.Requests
         public string SecondaryCallbackUrl { get; set; }
         public string Description { get; set; }
         public string ClientReference { get; set; }
-        public string VodafoneToken { get; set; }
+        public string Token { get; set; }
+        public bool FeesOnCustomer { get; set; }
 
         public static MomoPaymentRequest ToMomoPaymentRequest(PaymentRequest paymentRequest, 
             string primaryCallbackUrl, string secondaryCallbackUrl)
@@ -30,10 +31,11 @@ namespace Hubtel.PosProxy.Models.Requests
                 CustomerName = paymentRequest.CustomerName,
                 CustomerEmail = paymentRequest.CustomerEmail,
                 Description = paymentRequest.Description,
-                VodafoneToken = paymentRequest.MomoToken,
+                Token = paymentRequest.MomoToken,
                 ClientReference = paymentRequest.ClientReference,
                 PrimaryCallbackUrl = primaryCallbackUrl,
-                SecondaryCallbackUrl = secondaryCallbackUrl
+                SecondaryCallbackUrl = secondaryCallbackUrl,
+                FeesOnCustomer = paymentRequest.CustomerPaysFee
             };
         }
     }

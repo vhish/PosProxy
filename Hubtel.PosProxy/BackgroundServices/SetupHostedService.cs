@@ -9,12 +9,12 @@ using System.Threading.Tasks;
 
 namespace Hubtel.PosProxy.BackgroundServices
 {
-    internal class ConsumeScopedServiceHostedService : IHostedService
+    internal class SetupHostedService : IHostedService
     {
         private readonly ILogger _logger;
 
-        public ConsumeScopedServiceHostedService(IServiceProvider services,
-            ILogger<ConsumeScopedServiceHostedService> logger)
+        public SetupHostedService(IServiceProvider services,
+            ILogger<SetupHostedService> logger)
         {
             Services = services;
             _logger = logger;
@@ -27,23 +27,23 @@ namespace Hubtel.PosProxy.BackgroundServices
             _logger.LogInformation(
                 "Consume Scoped Service Hosted Service is starting.");
 
-            DoWork();
+            DoWork(cancellationToken);
 
             return Task.CompletedTask;
         }
 
-        private void DoWork()
+        private void DoWork(CancellationToken cancellationToken)
         {
             _logger.LogInformation(
                 "Consume Scoped Service Hosted Service is working.");
 
             using (var scope = Services.CreateScope())
             {
-                var scopedProcessingService =
+                var paymentStatusCheckService =
                     scope.ServiceProvider
-                        .GetRequiredService<IScopedProcessingService>();
+                        .GetRequiredService<IPaymentStatusCheckService>();
 
-                scopedProcessingService.DoWork();
+                paymentStatusCheckService.DoWorkAsync(cancellationToken);
             }
         }
 

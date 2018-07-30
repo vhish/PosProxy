@@ -11,8 +11,8 @@ namespace Hubtel.PosProxy.Models.Validators
     {
         public EmployeeValidator()
         {
-            RuleFor(x => x.EmployeeId).NotEmpty();
-            RuleFor(x => x.PhoneNumber).NotEmpty();
+            RuleFor(x => x.EmployeeId).NotEmpty().When(x => !string.IsNullOrEmpty(x.PhoneNumber.Trim()));
+            RuleFor(x => x.PhoneNumber).NotEmpty().When(x => !string.IsNullOrEmpty(x.EmployeeId.Trim()));
         }
     }
 }

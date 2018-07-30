@@ -75,7 +75,7 @@ namespace Hubtel.PosProxyData.Core
             var user = GetUserName();
             var userId = GetUserId();
             var accountId = GetAccountId();
-            var currentAccountId = !string.IsNullOrEmpty(user) ? user : "Anonymous";
+            var currentAccountId = !string.IsNullOrEmpty(accountId) ? accountId : "Anonymous";
             var currentUsername = !string.IsNullOrEmpty(user) ? user : "Anonymous";
             //var currentUserid = !string.IsNullOrEmpty(userId) ? userId : "Unknown";
 

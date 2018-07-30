@@ -1,5 +1,8 @@
-﻿using Hubtel.PosProxy.Models;
+﻿using Hubtel.PosProxy.Extensions;
+using Hubtel.PosProxy.Models;
 using Hubtel.PosProxy.Models.Requests;
+using Hubtel.PosProxy.Models.Responses;
+using Hubtel.PosProxyData.Core;
 using Hubtel.PosProxyData.EntityModels;
 using Hubtel.PosProxyData.Repositories;
 using System;
@@ -20,28 +23,24 @@ namespace Hubtel.PosProxy.Services
             _paymentRequestRepository = paymentRequestRepository;
         }
 
-        public abstract Task<bool> CheckStatusAsync(PaymentRequest paymentRequest);
-        public abstract Task<bool> ProcessPaymentAsync(PaymentRequest paymentRequest);
+        public abstract Task<HubtelPosProxyResponse<PaymentRequest>> CheckStatusAsync(PaymentRequest paymentRequest);
+        public abstract Task<HubtelPosProxyResponse<PaymentRequest>> ProcessPayment(PaymentRequest paymentRequest);
 
-        public async Task<bool> RecordPaymentAsync(PaymentRequest paymentRequest)
+        public async Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest)
         {
             var accountId = paymentRequest.AccountId;
 
             var orderPaymentRequest = OrderPaymentRequest.ToOrderPaymentRequest(paymentRequest);
             var response = await _unifiedSalesService.RecordPaymentAsync(orderPaymentRequest, accountId).ConfigureAwait(false);
-            if (response != null)
-            {
-                paymentRequest = await _paymentRequestRepository.UpdateAsync(paymentRequest, paymentRequest.Id).ConfigureAwait(false);
-                return true;
-            }
-            return false;
+            
+            return response;
         }
     }
 
     public interface IPaymentService
     {
-        Task<bool> ProcessPaymentAsync(PaymentRequest paymentRequest);
-        Task<bool> RecordPaymentAsync(PaymentRequest paymentRequest);
-        Task<bool> CheckStatusAsync(PaymentRequest paymentRequest);
+        Task<HubtelPosProxyResponse<PaymentRequest>> ProcessPayment(PaymentRequest paymentRequest);
+        Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest);
+        Task<HubtelPosProxyResponse<PaymentRequest>> CheckStatusAsync(PaymentRequest paymentRequest);
     }
 }

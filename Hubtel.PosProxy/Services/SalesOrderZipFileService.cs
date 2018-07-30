@@ -28,7 +28,7 @@ namespace Hubtel.PosProxy.Services
         {
             SalesOrderList salesOrderList = null;
 
-            JsonSerializer serializer = new JsonSerializer();
+            /*JsonSerializer serializer = new JsonSerializer();
             
             //FileStream outStream = new FileStream(outFile, FileMode.Create, FileAccess.Write);
             using (MemoryStream outStream = new MemoryStream())
@@ -60,7 +60,7 @@ namespace Hubtel.PosProxy.Services
                     salesOrderList = (SalesOrderList)serializer.Deserialize(jsonData, typeof(SalesOrderList));
                 }
             }
-            //outStream.Close();
+            //outStream.Close();*/
             return salesOrderList;   
         }
 

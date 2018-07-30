@@ -51,6 +51,27 @@ namespace Hubtel.PosProxyData.Migrations
                     table.PrimaryKey("PK_PaymentRequests", x => x.Id);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "SalesOrderZipFiles",
+                columns: table => new
+                {
+                    Id = table.Column<int>(nullable: false)
+                        .Annotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn),
+                    CreatedAt = table.Column<DateTime>(nullable: false),
+                    CreatedBy = table.Column<string>(nullable: true),
+                    UpdatedAt = table.Column<DateTime>(nullable: false),
+                    UpdatedBy = table.Column<string>(nullable: true),
+                    AccountId = table.Column<string>(nullable: true),
+                    Bucketname = table.Column<string>(nullable: true),
+                    Filename = table.Column<string>(nullable: true),
+                    MimeType = table.Column<string>(nullable: true),
+                    Processed = table.Column<bool>(nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_SalesOrderZipFiles", x => x.Id);
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_PaymentRequests_ClientReference",
                 table: "PaymentRequests",
@@ -63,6 +84,9 @@ namespace Hubtel.PosProxyData.Migrations
         {
             migrationBuilder.DropTable(
                 name: "PaymentRequests");
+
+            migrationBuilder.DropTable(
+                name: "SalesOrderZipFiles");
         }
     }
 }

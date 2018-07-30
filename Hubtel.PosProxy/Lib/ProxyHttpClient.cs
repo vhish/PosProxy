@@ -73,6 +73,24 @@ namespace Hubtel.PosProxy.Lib
             return response;
         }
 
+        public async Task<HttpResponseMessage> PatchAsync<T>(string requestUri, T payload,
+            string authorizationScheme, string token)
+        {
+            string postData = JsonConvert.SerializeObject(payload);
+            HttpContent httpContent = new StringContent(postData, Encoding.UTF8, "application/json");
+
+            var response = await MakePutRequestAsync(requestUri, httpContent, authorizationScheme, token);
+
+            if (response.StatusCode != HttpStatusCode.OK)
+            {
+                _logger.LogError(response.ReasonPhrase);
+                var respData = await response.Content.ReadAsStringAsync();
+                _logger.LogError(respData);
+            }
+
+            return response;
+        }
+
         public async Task<HttpResponseMessage> PostAsync<T>(string requestUri, T payload,
             string authorizationScheme, string token)
         {
@@ -129,6 +147,15 @@ namespace Hubtel.PosProxy.Lib
             return response;
         }
 
+        public async Task<HttpResponseMessage> MakePatchRequestAsync(string requestUri, HttpContent httpContent,
+            string authorizationScheme, string token)
+        {
+            _httpClient.DefaultRequestHeaders.Authorization =
+                new AuthenticationHeaderValue(authorizationScheme, token);
+            var response = await _httpClient.PatchAsync(requestUri, httpContent);
+            return response;
+        }
+
         public async Task<HttpResponseMessage> MakePostRequestAsync(string requestUri, HttpContent httpContent,
             string authorizationScheme, string token)
         {
@@ -161,6 +188,8 @@ namespace Hubtel.PosProxy.Lib
     {
         Task<HttpResponseMessage> PutAsync<T>(string requestUri, T payload,
             string authorizationScheme, string token);
+        Task<HttpResponseMessage> PatchAsync<T>(string requestUri, T payload,
+                    string authorizationScheme, string token);
         Task<HttpResponseMessage> PostAsync<T>(string requestUri, T payload,
             string authorizationScheme, string token);
         Task<HttpResponseMessage> GetAsync(string requestUri, string authorizationScheme, string token);

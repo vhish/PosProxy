@@ -5,13 +5,13 @@ using System.Threading.Tasks;
 
 namespace Hubtel.PosProxy.Models.Dtos
 {
-    public class HubtelMeCallbackRequestDto
+    public class MomoCallbackRequestDto
     {
         public string ResponseCode { get; set; }
         public MomoCallback Data { get; set; }
     }
 
-    public class HubtelMeCallback
+    public class MomoCallback
     {
         public double AmountAfterCharges { get; set; }
         public string TransactionId { get; set; }
