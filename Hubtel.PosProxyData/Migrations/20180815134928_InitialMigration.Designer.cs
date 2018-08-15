@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hubtel.PosProxyData.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180723092219_InitialMigration")]
+    [Migration("20180815134928_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -29,15 +29,17 @@ namespace Hubtel.PosProxyData.Migrations
 
                     b.Property<string>("AccountId");
 
-                    b.Property<decimal>("Amount")
+                    b.Property<decimal>("AmountAfterCharges")
                         .HasColumnType("decimal(20, 4)");
 
-                    b.Property<decimal>("AmountAfterCharges")
+                    b.Property<decimal>("AmountPaid")
                         .HasColumnType("decimal(20, 4)");
 
                     b.Property<string>("BranchId");
 
                     b.Property<string>("BranchName");
+
+                    b.Property<bool?>("ChargeCustomer");
 
                     b.Property<decimal>("Charges")
                         .HasColumnType("decimal(20, 4)");
@@ -49,23 +51,21 @@ namespace Hubtel.PosProxyData.Migrations
 
                     b.Property<string>("CreatedBy");
 
-                    b.Property<string>("CustomerEmail");
+                    b.Property<string>("CustomerMobileNumber");
 
                     b.Property<string>("CustomerName");
 
-                    b.Property<bool>("CustomerPaysFee");
-
                     b.Property<string>("Description");
-
-                    b.Property<string>("EmployeeEmail");
 
                     b.Property<string>("EmployeeId");
 
                     b.Property<string>("EmployeeName");
 
-                    b.Property<string>("EmployeePhone");
-
                     b.Property<string>("ExternalTransactionId");
+
+                    b.Property<bool>("IsRefund");
+
+                    b.Property<bool>("IsSuccessful");
 
                     b.Property<string>("MomoChannel");
 
@@ -75,13 +75,20 @@ namespace Hubtel.PosProxyData.Migrations
 
                     b.Property<string>("Note");
 
-                    b.Property<DateTime>("PaymentDate");
+                    b.Property<string>("OfflineGuid")
+                        .HasMaxLength(50);
+
+                    b.Property<Guid?>("OrderId");
+
+                    b.Property<DateTime?>("PaymentDate");
 
                     b.Property<string>("PaymentType");
 
-                    b.Property<string>("PosDevice");
+                    b.Property<string>("PosDeviceId");
 
-                    b.Property<string>("SalesOrderId");
+                    b.Property<string>("PosDeviceType");
+
+                    b.Property<string>("ReceiptNumber");
 
                     b.Property<string>("Status");
 

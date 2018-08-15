@@ -32,7 +32,9 @@ namespace Hubtel.PosProxy.Models.Dtos
 
         public string Description { get; set; }
 
-        public int PosDeviceId { get; set; }
+        public string PosDeviceId { get; set; }
+
+        public string PosDeviceType { get; set; }
 
         public string EmployeeId { get; set; }
 

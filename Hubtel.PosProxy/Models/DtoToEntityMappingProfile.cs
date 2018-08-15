@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using Hubtel.PosProxy.Models.Dtos;
 using Hubtel.PosProxy.Models.Requests;
 using Hubtel.PosProxyData.EntityModels;
 using System;
@@ -6,7 +7,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Hubtel.PosProxy.Models.Dtos
+namespace Hubtel.PosProxy.Models
 {
     public class DtoToEntityMappingProfile : Profile
     {
@@ -16,6 +17,7 @@ namespace Hubtel.PosProxy.Models.Dtos
 
             CreateMap<PaymentRequestDto, PaymentRequest>()
                 .ForMember(dest => dest.Status, conf => conf.MapFrom(src => "Pending"))
+                .ForMember(dest => dest.ChargeCustomer, conf => conf.MapFrom(src => src.ChargeCustomer ?? true))
                 .ForMember(dest => dest.PaymentDate, conf => conf.MapFrom(src => src.PaymentDate ?? DateTime.Now))
                 .ForMember(dest => dest.ClientReference, conf => conf.MapFrom(src => Guid.NewGuid()))
                 .ForMember(dest => dest.BranchId, conf => conf.MapFrom(src => src.BranchId))

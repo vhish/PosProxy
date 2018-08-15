@@ -10,7 +10,9 @@ namespace Hubtel.PosProxy.Models.Dtos
     {
         public string IntegrationChannel { get; set; }
 
-        public int? PosDeviceId { get; set; }
+        public string PosDeviceId { get; set; }
+
+        public string PosDeviceType { get; set; }
 
         public DateTime? OrderDate { get; set; }
 

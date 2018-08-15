@@ -36,6 +36,8 @@ namespace Hubtel.PosProxyData.EntityModels
 
         public string PosDeviceId { get; set; }
 
+        public string PosDeviceType { get; set; }
+
         public string EmployeeId { get; set; }
 
         public string EmployeeName { get; set; }

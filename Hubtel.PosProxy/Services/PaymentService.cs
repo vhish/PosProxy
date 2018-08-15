@@ -30,8 +30,8 @@ namespace Hubtel.PosProxy.Services
         {
             var accountId = paymentRequest.AccountId;
 
-            var orderPaymentRequest = OrderPaymentRequest.ToOrderPaymentRequest(paymentRequest);
-            var response = await _unifiedSalesService.RecordPaymentAsync(orderPaymentRequest, accountId).ConfigureAwait(false);
+            //var orderPaymentRequest = OrderPaymentRequest.ToOrderPaymentRequest(paymentRequest);
+            var response = await _unifiedSalesService.RecordPaymentAsync(paymentRequest, accountId).ConfigureAwait(false);
             
             return response;
         }

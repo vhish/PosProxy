@@ -20,8 +20,8 @@ namespace Hubtel.PosProxy.Models.Validators
                 .WithMessage("The payment type is not valid");
             RuleFor(vm => vm.AmountPaid).NotNull().NotEmpty();
             RuleFor(vm => vm.PosDeviceId).NotNull().NotEmpty();
-            RuleFor(vm => vm.OrderId).NotNull().NotEmpty();
-            RuleFor(vm => vm.ChargeCustomer).NotNull().NotEmpty();
+            //RuleFor(vm => vm.OrderId).NotNull().NotEmpty();
+            //RuleFor(vm => vm.ChargeCustomer).NotNull().NotEmpty();
             RuleFor(vm => vm.AmountPaid).GreaterThanOrEqualTo(0);
             RuleFor(vm => vm.MomoPhoneNumber).Must(HaveValidCustomerMsisdn).When(x => isMsisdnRequired(x.PaymentType));
             RuleFor(vm => vm.MomoPhoneNumber).Must(HaveValidChannel).When(x => isMsisdnRequired(x.PaymentType));

@@ -76,7 +76,7 @@ namespace Hubtel.PosProxy.Authentication
             {
                 new Claim(ClaimTypes.Name, "Anonymous"),
                 new Claim(ClaimTypes.Sid, hubtelProfile.AccountId),
-                new Claim(ClaimTypes.MobilePhone, hubtelProfile.MobileNumber)
+                new Claim(ClaimTypes.MobilePhone, hubtelProfile?.MobileNumber ?? string.Empty)
             };
 
             var identities = new List<ClaimsIdentity>
@@ -94,7 +94,7 @@ namespace Hubtel.PosProxy.Authentication
             var claims = new List<Claim>
             {
                 new Claim(ClaimTypes.Name, claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value ?? string.Empty),
-                new Claim(ClaimTypes.Sid, claimsPrincipal.FindFirst(ClaimTypes.Sid)?.Value ?? string.Empty),
+                new Claim(ClaimTypes.Sid, claimsPrincipal.FindFirst(ClaimTypes.Sid).Value),
                 new Claim(ClaimTypes.Role, claimsPrincipal.FindFirst(ClaimTypes.Role)?.Value ?? string.Empty),
                 new Claim(ClaimTypes.MobilePhone, claimsPrincipal.FindFirst(ClaimTypes.MobilePhone)?.Value ?? string.Empty)
             };
