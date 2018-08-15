@@ -53,36 +53,50 @@ namespace Hubtel.PosProxy.Controllers
         }
 
         [BenchmarkAttributeFilter, HttpPost, Route("")]
-        public async Task<IActionResult> Create([FromBody] CreateTransactionRequestDto payload)
+        public async Task<IActionResult> Create([FromBody] OrderRequestDto payload)
         {
             TextInfo caseFormat = new CultureInfo("en-US", false).TextInfo;
 
             var accountId = UserHelper.GetAccountId(User);
 
-            if (payload.Order != null)
+            if (payload == null)
             {
-                var orderValidator = new OrderRequestValidator();
-                orderValidator.Validate(payload.Order).AddToModelState(ModelState, null);
-                if (!ModelState.IsValid) return BadRequest(Responses.ErrorResponse<PaymentRequest>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
+                ModelState.AddModelError("order", "The order cannot be blank");
+                return BadRequest(Responses.ErrorResponse<PaymentRequest>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
+            }
 
-                var orderRequest = _mapper.Map<OrderRequest>(payload.Order);
-                var orderResult = await _unifiedSalesService.RecordOrderAsync(orderRequest, accountId).ConfigureAwait(false);
-                if (!orderResult.Success)
-                {
-                    orderResult.Data = null;
-                    return BadRequest(orderResult);
-                }
-                payload.Payment.SalesOrderId = orderResult.Data.Token;
+            var payment = payload.Payments.FirstOrDefault();
+            if (payment == null)
+            {
+                ModelState.AddModelError("payment", "There is no payment attached to the order");
+                return BadRequest(Responses.ErrorResponse<PaymentRequest>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
             }
 
             var paymentValidator = new PaymentRequestValidator(_paymentTypeConfiguration);
-            paymentValidator.Validate(payload.Payment).AddToModelState(ModelState, null);
+            paymentValidator.Validate(payment).AddToModelState(ModelState, null);
             if (!ModelState.IsValid) return BadRequest(Responses.ErrorResponse<PaymentRequest>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
 
-            var paymentRequest = _mapper.Map<PaymentRequest>(payload.Payment);
+            var orderValidator = new OrderRequestValidator();
+            orderValidator.Validate(payload).AddToModelState(ModelState, null);
+            if (!ModelState.IsValid) return BadRequest(Responses.ErrorResponse<PaymentRequest>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
+
+            //var orderRequest = _mapper.Map<OrderRequest>(payload.Order);
+            var orderResult = await _unifiedSalesService.RecordOrderAsync(payload, accountId).ConfigureAwait(false);
+            if (!orderResult.Success)
+            {
+                orderResult.Data = null;
+                return BadRequest(orderResult);
+            }
+            payment.OrderId = orderResult.Data.Id;
+            /*foreach(var payment in payload.Payments)
+            {
+                payment.OrderId = orderResult.Data.Id;
+            }*/
+
+            var paymentRequest = _mapper.Map<PaymentRequest>(payment);
             paymentRequest = await _paymentRequestRepository.AddAsync(paymentRequest).ConfigureAwait(false);
 
-            var paymentTypeClassName = $"Hubtel.PosProxy.Services.{caseFormat.ToTitleCase(payload.Payment.PaymentType.ToLower())}PaymentService";
+            var paymentTypeClassName = $"Hubtel.PosProxy.Services.{caseFormat.ToTitleCase(payment.PaymentType.ToLower())}PaymentService";
             var paymentService = (PaymentService)ActivatorUtilities.CreateInstance(_provider, Type.GetType(paymentTypeClassName));
             //-->
             var processPaymentResult = await paymentService.ProcessPayment(paymentRequest).ConfigureAwait(false);

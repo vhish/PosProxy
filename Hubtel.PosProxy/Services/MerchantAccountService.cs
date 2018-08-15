@@ -176,9 +176,9 @@ namespace Hubtel.PosProxy.Services
 
             var momoFeeRequest = new MomoFeeRequest
             {
-                Amount = paymentRequest.Amount,
+                Amount = paymentRequest.AmountPaid,
                 Channel = paymentRequest.MomoChannel,
-                FeesOnCustomer = paymentRequest.CustomerPaysFee
+                FeesOnCustomer = paymentRequest.ChargeCustomer ?? true
             };
 
             using (var response = await _merchantAccountHttpClient.PostAsync(url, momoFeeRequest,

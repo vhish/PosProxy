@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hubtel.PosProxy.Models.Validators
 {
-    public class PaymentRequestValidator : AbstractValidator<CreatePaymentRequestDto>
+    public class PaymentRequestValidator : AbstractValidator<PaymentRequestDto>
     {
         private readonly IPaymentTypeConfiguration _paymentTypeConfiguration;
 
@@ -18,18 +18,19 @@ namespace Hubtel.PosProxy.Models.Validators
             RuleFor(vm => vm.PaymentType).NotEmpty();
             RuleFor(vm => vm.PaymentType).Must(HaveValidPaymentType)
                 .WithMessage("The payment type is not valid");
-            RuleFor(vm => vm.Amount).NotNull().NotEmpty();
-            RuleFor(vm => vm.PosDevice).NotNull().NotEmpty();
-            RuleFor(vm => vm.SalesOrderId).NotNull().NotEmpty();
-            RuleFor(vm => vm.CustomerPaysFee).NotNull().NotEmpty();
-            RuleFor(vm => vm.Amount).GreaterThanOrEqualTo(0);
+            RuleFor(vm => vm.AmountPaid).NotNull().NotEmpty();
+            RuleFor(vm => vm.PosDeviceId).NotNull().NotEmpty();
+            RuleFor(vm => vm.OrderId).NotNull().NotEmpty();
+            RuleFor(vm => vm.ChargeCustomer).NotNull().NotEmpty();
+            RuleFor(vm => vm.AmountPaid).GreaterThanOrEqualTo(0);
             RuleFor(vm => vm.MomoPhoneNumber).Must(HaveValidCustomerMsisdn).When(x => isMsisdnRequired(x.PaymentType));
             RuleFor(vm => vm.MomoPhoneNumber).Must(HaveValidChannel).When(x => isMsisdnRequired(x.PaymentType));
             RuleFor(vm => vm.MomoToken).NotEmpty().When(x => isChannelTokenRequired(x.MomoChannel));
-            RuleFor(vm => vm.CustomerPaysFee).NotNull().NotEmpty().When(x => isMsisdnRequired(x.PaymentType));
-            RuleFor(vm => vm.Employee).SetValidator(new EmployeeValidator());
-            RuleFor(vm => vm.Branch).SetValidator(new BranchValidator());
-            RuleFor(vm => vm.Customer).SetValidator(new CustomerValidator());
+            RuleFor(vm => vm.ChargeCustomer).NotNull().NotEmpty().When(x => isMsisdnRequired(x.PaymentType));
+            RuleFor(x => x.EmployeeId).NotEmpty().When(x => !string.IsNullOrEmpty(x.EmployeeName.Trim()));
+            RuleFor(x => x.EmployeeName).NotEmpty().When(x => !string.IsNullOrEmpty(x.EmployeeId.Trim()));
+            RuleFor(x => x.BranchId).NotEmpty().When(x => !string.IsNullOrEmpty(x.BranchName));
+            RuleFor(x => x.BranchName).NotEmpty().When(x => !string.IsNullOrEmpty(x.BranchId));
         }
 
         private bool HaveValidPaymentType(string paymentType)

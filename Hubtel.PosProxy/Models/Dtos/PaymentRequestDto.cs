@@ -1,12 +1,14 @@
-﻿using System;
+﻿using FluentValidation.Attributes;
+using Hubtel.PosProxy.Models.Validators;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Hubtel.PosProxyData.EntityModels
+namespace Hubtel.PosProxy.Models.Dtos
 {
-    public class PaymentRequest : BaseEntity
+    public class PaymentRequestDto
     {
         public string PaymentType { get; set; }
 
@@ -18,11 +20,7 @@ namespace Hubtel.PosProxyData.EntityModels
 
         public string MomoToken { get; set; }
 
-        public string TransactionSession { get; set; }
-        public string TransactionId { get; set; } // from merchant account
-        public string ExternalTransactionId { get; set; }// from telco to merchant account
-        public decimal AmountAfterCharges { get; set; }
-        public decimal Charges { get; set; }
+        public string MerchantTransactionId { get; set; }
 
         public bool? ChargeCustomer { get; set; }
 
@@ -34,7 +32,7 @@ namespace Hubtel.PosProxyData.EntityModels
 
         public string Description { get; set; }
 
-        public string PosDeviceId { get; set; }
+        public int PosDeviceId { get; set; }
 
         public string EmployeeId { get; set; }
 
@@ -54,12 +52,7 @@ namespace Hubtel.PosProxyData.EntityModels
 
         public string ReceiptNumber { get; set; }
 
-        [StringLength(50)]
+        [StringLength(40)]
         public string OfflineGuid { get; set; }
-
-        [MaxLength(255)]
-        public string ClientReference { get; set; }
-        
-        public string Status { get; set; }
     }
 }

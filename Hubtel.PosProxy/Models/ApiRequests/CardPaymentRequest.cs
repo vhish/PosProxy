@@ -22,10 +22,10 @@ namespace Hubtel.PosProxy.Models.Requests
         {
             return new CardPaymentRequest
             {
-                Amount = decimal.Round(paymentRequest.Amount, 2),
+                Amount = decimal.Round(paymentRequest.AmountPaid, 2),
                 CustomerMsisdn = paymentRequest.MomoPhoneNumber,
                 CustomerName = paymentRequest.CustomerName,
-                CustomerEmail = paymentRequest.CustomerEmail,
+                //CustomerEmail = paymentRequest.CustomerEmail,
                 Description = paymentRequest.Description,
                 ClientReference = paymentRequest.ClientReference,
                 PrimaryCallbackUrl = primaryCallbackUrl,

@@ -3,6 +3,7 @@ using Hubtel.PosProxy.Extensions;
 using Hubtel.PosProxy.Helpers;
 using Hubtel.PosProxy.Lib;
 using Hubtel.PosProxy.Models;
+using Hubtel.PosProxy.Models.Dtos;
 using Hubtel.PosProxy.Models.Requests;
 using Hubtel.PosProxy.Models.Responses;
 using Microsoft.Extensions.Logging;
@@ -29,9 +30,9 @@ namespace Hubtel.PosProxy.Services
             _logger = logger;
         }
 
-        public async Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(OrderPaymentRequest orderPaymentRequest, string accountId)
+        public async Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(PaymentRequestDto orderPaymentRequest, string accountId)
         {
-            var url = $"{_unifiedSalesConfiguration.BaseUrl}/invoice/{orderPaymentRequest.SalesOrderId}/payment";
+            var url = $"{_unifiedSalesConfiguration.BaseUrl}/payment"; ///{orderPaymentRequest.SalesOrderId}/payment";
 
             var authToken = HubtelBasicAuthHelper.GenerateToken(_unifiedSalesConfiguration.ApiKey, accountId);
 
@@ -55,9 +56,9 @@ namespace Hubtel.PosProxy.Services
             }
         }
 
-        public async Task<HubtelPosProxyResponse<OrderResponse>> RecordOrderAsync(OrderRequest orderRequest, string accountId)
+        public async Task<HubtelPosProxyResponse<OrderResponse>> RecordOrderAsync(OrderRequestDto orderRequest, string accountId)
         {
-            var url = $"{_unifiedSalesConfiguration.BaseUrl}/invoice";
+            var url = $"{_unifiedSalesConfiguration.BaseUrl}/order";
 
             var authToken = HubtelBasicAuthHelper.GenerateToken(_unifiedSalesConfiguration.ApiKey, accountId);
 
@@ -92,7 +93,7 @@ namespace Hubtel.PosProxy.Services
 
     public interface IUnifiedSalesService
     {
-        Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(OrderPaymentRequest orderPaymentRequest, string accountId);
-        Task<HubtelPosProxyResponse<OrderResponse>> RecordOrderAsync(OrderRequest orderRequest, string accountId);
+        Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(PaymentRequestDto orderPaymentRequest, string accountId);
+        Task<HubtelPosProxyResponse<OrderResponse>> RecordOrderAsync(OrderRequestDto orderRequest, string accountId);
     }
 }

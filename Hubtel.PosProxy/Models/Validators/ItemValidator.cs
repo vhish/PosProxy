@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace Hubtel.PosProxy.Models.Validators
 {
-    public class ItemValidator : AbstractValidator<ItemDto>
+    public class ItemValidator : AbstractValidator<OrderItemDto>
     {
         public ItemValidator()
         {

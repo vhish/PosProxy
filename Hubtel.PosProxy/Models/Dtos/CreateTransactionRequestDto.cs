@@ -7,7 +7,7 @@ namespace Hubtel.PosProxy.Models.Dtos
 {
     public class CreateTransactionRequestDto
     {
-        public CreateOrderRequestDto Order;
-        public CreatePaymentRequestDto Payment;
+        public OrderRequestDto Order;
+        public PaymentRequestDto Payment;
     }
 }
