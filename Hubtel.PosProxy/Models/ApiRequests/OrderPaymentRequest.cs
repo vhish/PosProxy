@@ -3,6 +3,7 @@ using Hubtel.PosProxy.Models.Responses;
 using Hubtel.PosProxyData.EntityModels;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -35,7 +36,7 @@ namespace Hubtel.PosProxy.Models.Requests
 
         public string Description { get; set; }
 
-        public int PosDeviceId { get; set; }
+        public string PosDeviceId { get; set; }
 
         public string EmployeeId { get; set; }
 
@@ -62,26 +63,32 @@ namespace Hubtel.PosProxy.Models.Requests
         {
             return new OrderPaymentRequest
             {
-                SalesOrderId = paymentRequest.OrderId.ToString(),
-                PaymentAmount = paymentRequest.AmountPaid,
+                OrderId = paymentRequest.OrderId,
+                AmountPaid = paymentRequest.AmountPaid,
                 PaymentDate = paymentRequest.PaymentDate ?? DateTime.Now,
-                MerchantBearsFee = !paymentRequest.ChargeCustomer ?? false,
+                ChargeCustomer = !paymentRequest.ChargeCustomer ?? false,
                 Note = paymentRequest.Note,
-                PaymentFee = paymentRequest.Charges,
-                PaymentStatus = paymentRequest.Status,
+                Charges = paymentRequest.Charges,
+                IsSuccessful = paymentRequest.IsSuccessful,
                 PaymentType = paymentRequest.PaymentType,
-                PaymentReference = paymentRequest.ClientReference,
-                PosDevice = paymentRequest.PosDeviceId,
-                Branch = new Branch
-                {
-                    BranchId = paymentRequest.BranchId,
-                    Name = paymentRequest.BranchName
-                },
-                Employee = new Employee
-                {
-                    EmployeeId = paymentRequest.EmployeeId,
-                    Name = paymentRequest.EmployeeName
-                }
+                PosDeviceId = paymentRequest.PosDeviceId,
+                BranchId = paymentRequest.BranchId,
+                BranchName = paymentRequest.BranchName,
+                EmployeeId = paymentRequest.EmployeeId,
+                EmployeeName = paymentRequest.EmployeeName,
+                CustomerMobileNumber = paymentRequest.CustomerMobileNumber,
+                ReceiptNumber = paymentRequest.ReceiptNumber,
+                Description = paymentRequest.Description,
+                MomoChannel = paymentRequest.MomoChannel,
+                MomoPhoneNumber = paymentRequest.MomoPhoneNumber,
+                MomoToken = paymentRequest.MomoToken,
+                IsRefund = paymentRequest.IsRefund,
+                OfflineGuid = paymentRequest.OfflineGuid,
+                ExternalTransactionId = paymentRequest.ExternalTransactionId,
+                TransactionId = paymentRequest.TransactionId,
+                AmountAfterCharges = paymentRequest.AmountAfterCharges
+
+              
             };
         }
     }
