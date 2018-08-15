@@ -16,9 +16,9 @@ namespace Hubtel.PosProxy.Models.Responses
 
     public class OrderResponse
     {
-        public string Token { get; set; }
-        public decimal TotalAmount { get; set; }
-        public decimal NetAmount { get; set; }
-        public string InvoiceNumber { get; set; }
+        public Guid Id { get; set; }
+        public decimal AmountPaid { get; set; }
+        public decimal AmountDue { get; set; }
+        public string OrderNumber { get; set; }
     }
 }

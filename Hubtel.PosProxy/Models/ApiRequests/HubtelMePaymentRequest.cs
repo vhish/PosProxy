@@ -21,13 +21,13 @@ namespace Hubtel.PosProxy.Models.Requests
         {
             return new HubtelMePaymentRequest
             {
-                Amount = decimal.Round(paymentRequest.Amount, 2),
+                Amount = decimal.Round(paymentRequest.AmountPaid, 2),
                 ApplicationAccountId = paymentRequest.MomoPhoneNumber,
                 ApplicationAlias = applicationAlias,
                 Description = paymentRequest.Description,
                 ClientReference = paymentRequest.ClientReference,
                 PaymentCallBackUrl = paymentCallbackUrl,
-                SalesInvoiceToken = paymentRequest.SalesOrderId
+                SalesInvoiceToken = paymentRequest.OrderId.ToString()
             };
         }
     }

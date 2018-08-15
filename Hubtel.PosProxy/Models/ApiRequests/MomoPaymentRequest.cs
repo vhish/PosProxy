@@ -25,17 +25,16 @@ namespace Hubtel.PosProxy.Models.Requests
         {
             return new MomoPaymentRequest
             {
-                Amount = decimal.Round(paymentRequest.Amount, 2),
+                Amount = decimal.Round(paymentRequest.AmountPaid, 2),
                 Channel = paymentRequest.MomoChannel,
                 CustomerMsisdn = paymentRequest.MomoPhoneNumber,
                 CustomerName = paymentRequest.CustomerName,
-                CustomerEmail = paymentRequest.CustomerEmail,
                 Description = paymentRequest.Description,
                 Token = paymentRequest.MomoToken,
                 ClientReference = paymentRequest.ClientReference,
                 PrimaryCallbackUrl = primaryCallbackUrl,
                 SecondaryCallbackUrl = secondaryCallbackUrl,
-                FeesOnCustomer = paymentRequest.CustomerPaysFee
+                FeesOnCustomer = paymentRequest.ChargeCustomer.HasValue ? paymentRequest.ChargeCustomer.Value : true
             };
         }
     }
