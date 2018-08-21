@@ -26,7 +26,7 @@ namespace Hubtel.PosProxy.Services
         public abstract Task<HubtelPosProxyResponse<PaymentRequest>> CheckStatusAsync(PaymentRequest paymentRequest);
         public abstract Task<HubtelPosProxyResponse<PaymentRequest>> ProcessPayment(PaymentRequest paymentRequest);
 
-        public async Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest)
+        public async Task<HubtelPosProxyResponse<PaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest)
         {
             var accountId = paymentRequest.AccountId;
 
@@ -40,7 +40,7 @@ namespace Hubtel.PosProxy.Services
     public interface IPaymentService
     {
         Task<HubtelPosProxyResponse<PaymentRequest>> ProcessPayment(PaymentRequest paymentRequest);
-        Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest);
+        Task<HubtelPosProxyResponse<PaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest);
         Task<HubtelPosProxyResponse<PaymentRequest>> CheckStatusAsync(PaymentRequest paymentRequest);
     }
 }

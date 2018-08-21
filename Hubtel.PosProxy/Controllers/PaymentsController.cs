@@ -80,8 +80,8 @@ namespace Hubtel.PosProxy.Controllers
             orderValidator.Validate(payload).AddToModelState(ModelState, null);
             if (!ModelState.IsValid) return BadRequest(Responses.ErrorResponse<PaymentRequest>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
 
-            //var orderRequest = _mapper.Map<OrderRequest>(payload.Order);
-            var orderResult = await _unifiedSalesService.RecordOrderAsync(payload, accountId).ConfigureAwait(false);
+            var orderRequest = _mapper.Map<OrderRequest>(payload);
+            var orderResult = await _unifiedSalesService.RecordOrderAsync(orderRequest, accountId).ConfigureAwait(false);
             if (!orderResult.Success)
             {
                 orderResult.Data = null;
@@ -116,9 +116,12 @@ namespace Hubtel.PosProxy.Controllers
         {
             if (payload.Data?.ClientReference != null)
             {
-                var paymentRequest = GetPaymentRequest(payload.Data.ClientReference, payload.Data.TransactionId, 
+                var paymentRequest = FinalizePaymentRequest(payload.Data.ClientReference, payload.Data.TransactionId, 
                     payload.ResponseCode);
-                var response = await _cardPaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                if(paymentRequest != null)
+                {
+                    var response = await _cardPaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                }
             }
             return Ok();
         }
@@ -130,11 +133,14 @@ namespace Hubtel.PosProxy.Controllers
         {
             if(payload.Data?.ClientReference != null)
             {
-                var paymentRequest = GetPaymentRequest(payload.Data.ClientReference, payload.Data.TransactionId, 
+                var paymentRequest = FinalizePaymentRequest(payload.Data.ClientReference, payload.Data.TransactionId, 
                     payload.ResponseCode);
-                if(paymentRequest.Status.Equals(En.PaymentStatus.SUCCESSFUL) || paymentRequest.Status.Equals(En.PaymentStatus.FAILED))
+                if (paymentRequest != null)
                 {
-                    var response = await _momoPaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                    if (paymentRequest.Status.Equals(En.PaymentStatus.SUCCESSFUL) || paymentRequest.Status.Equals(En.PaymentStatus.FAILED))
+                    {
+                        var response = await _momoPaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                    }
                 }
             }
             return Ok();
@@ -147,26 +153,37 @@ namespace Hubtel.PosProxy.Controllers
         {
             if (payload.Data?.ClientReference != null)
             {
-                var paymentRequest = GetPaymentRequest(payload.Data.ClientReference, payload.Data.TransactionId,
+                var paymentRequest = FinalizePaymentRequest(payload.Data.ClientReference, payload.Data.TransactionId,
                     payload.ResponseCode);
-                if (paymentRequest.Status.Equals(En.PaymentStatus.SUCCESSFUL) || paymentRequest.Status.Equals(En.PaymentStatus.FAILED))
+                if (paymentRequest != null)
                 {
-                    var response = await _hubtelMePaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                    if (paymentRequest.Status.Equals(En.PaymentStatus.SUCCESSFUL) || paymentRequest.Status.Equals(En.PaymentStatus.FAILED))
+                    {
+                        var response = await _hubtelMePaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                    }
                 }
+                    
             }
             return Ok();
         }
 
-        private PaymentRequest GetPaymentRequest(string clientReference, string transactionId, string responseCode)
+        private PaymentRequest FinalizePaymentRequest(string clientReference, string transactionId, string responseCode)
         {
-            var paymentRequest = _paymentRequestRepository.Find(x => x.ClientReference == clientReference && 
-            x.TransactionId == transactionId);
-            if(paymentRequest != null)
+            /*var paymentRequest = _paymentRequestRepository.Find(x => x.ClientReference == clientReference && 
+            x.TransactionId == transactionId);*/
+            var paymentRequest = _paymentRequestRepository.Find(x => x.ClientReference == clientReference);
+            if (paymentRequest != null)
             {
                 if (responseCode.Equals(ResponseCodes.PAYMENT_SUCCESSFUL))
+                {
                     paymentRequest.Status = En.PaymentStatus.SUCCESSFUL;
+                    paymentRequest.IsSuccessful = true;
+                }
                 else
+                {
                     paymentRequest.Status = En.PaymentStatus.FAILED;
+                    paymentRequest.IsSuccessful = false;
+                }
             }
             return paymentRequest;
         }

@@ -9,17 +9,21 @@ namespace Hubtel.PosProxy.Models.Responses
     {
         public int Code { get; set; }
         public string Message { get; set; }
+        public string Status { get; set; }
         public object Data { get; set; }
-        public List<UnifiedSalesError> Errors { get; set; }
-        public object Guid { get; set; }
     }
 
-    public class UnifiedSalesError
+    public class UnifiedSalesValidationErrorResponse
     {
         public int Code { get; set; }
+        public string Message { get; set; }
+        public string Status { get; set; }
+        public List<UnifiedSalesValidationError> Data { get; set; }
+    }
+
+    public class UnifiedSalesValidationError
+    {
         public string Field { get; set; }
-        public string DeveloperMessage { get; set; }
-        public string UserMessage { get; set; }
-        public object MoreInfo { get; set; }
+        public List<string> Messages { get; set; }
     }
 }

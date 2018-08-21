@@ -76,7 +76,7 @@ namespace Hubtel.PosProxy.BackgroundServices
 
         private async Task CheckStatusAsync(PaymentRequest paymentRequest)
         {
-            if (paymentRequest.Status.Equals(En.PaymentStatus.PENDING))
+            if (!paymentRequest.Status.Equals(En.PaymentStatus.PENDING))
                 return;
 
             using (var db = new CheckStatusDbContext(_configuration))

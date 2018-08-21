@@ -31,7 +31,7 @@ namespace Hubtel.PosProxy.Services
             _logger = logger;
         }
 
-        public async Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest, string accountId)
+        public async Task<HubtelPosProxyResponse<PaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest, string accountId)
         {
             var url = $"{_unifiedSalesConfiguration.BaseUrl}/payments"; ///{orderPaymentRequest.SalesOrderId}/payment";
 
@@ -42,7 +42,7 @@ namespace Hubtel.PosProxy.Services
                 var respData = await response.Content.ReadAsStringAsync();
                 if (response.IsSuccessStatusCode)
                 {
-                    var result = JsonConvert.DeserializeObject<OrderPaymentResponse>(respData);
+                    var result = JsonConvert.DeserializeObject<PaymentResponse>(respData);
                     
                     _logger.LogDebug(respData);
                     return Responses.SuccessResponse(StatusMessage.Found, result, ResponseCodes.SUCCESS);
@@ -51,13 +51,21 @@ namespace Hubtel.PosProxy.Services
                 {
                     Error = HandleDeserializationError
                 });
+                if (error.Code == 4000)
+                {
+                    var validationError = JsonConvert.DeserializeObject<UnifiedSalesValidationErrorResponse>(respData, new JsonSerializerSettings
+                    {
+                        Error = HandleDeserializationError
+                    });
+                    return Responses.ErrorResponse(validationError.ToErrors(), new PaymentResponse(), error.Message, ResponseCodes.EXTERNAL_ERROR);
+                }
                 _logger.LogError(response.ReasonPhrase);
                 _logger.LogError(respData);
-                return Responses.ErrorResponse(error.ToErrors(), new OrderPaymentResponse(), error.Message, ResponseCodes.EXTERNAL_ERROR);
+                return Responses.ErrorResponse(error.ToErrors(), new PaymentResponse(), error.Message, ResponseCodes.EXTERNAL_ERROR);
             }
         }
 
-        public async Task<HubtelPosProxyResponse<OrderResponse>> RecordOrderAsync(OrderRequestDto orderRequest, string accountId)
+        public async Task<HubtelPosProxyResponse<OrderResponse>> RecordOrderAsync(OrderRequest orderRequest, string accountId)
         {
             var url = $"{_unifiedSalesConfiguration.BaseUrl}/orders";
 
@@ -77,6 +85,14 @@ namespace Hubtel.PosProxy.Services
                 {
                     Error = HandleDeserializationError
                 });
+                if(error.Code == 4000)
+                {
+                    var validationError = JsonConvert.DeserializeObject<UnifiedSalesValidationErrorResponse>(respData, new JsonSerializerSettings
+                    {
+                        Error = HandleDeserializationError
+                    });
+                    return Responses.ErrorResponse(validationError.ToErrors(), new OrderResponse(), error.Message, ResponseCodes.EXTERNAL_ERROR);
+                }
                 _logger.LogError(response.ReasonPhrase);
                 _logger.LogError(respData);
                 return Responses.ErrorResponse(error.ToErrors(), new OrderResponse(), error.Message, ResponseCodes.EXTERNAL_ERROR);
@@ -94,7 +110,7 @@ namespace Hubtel.PosProxy.Services
 
     public interface IUnifiedSalesService
     {
-        Task<HubtelPosProxyResponse<OrderPaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest, string accountId);
-        Task<HubtelPosProxyResponse<OrderResponse>> RecordOrderAsync(OrderRequestDto orderRequest, string accountId);
+        Task<HubtelPosProxyResponse<PaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest, string accountId);
+        Task<HubtelPosProxyResponse<OrderResponse>> RecordOrderAsync(OrderRequest orderRequest, string accountId);
     }
 }

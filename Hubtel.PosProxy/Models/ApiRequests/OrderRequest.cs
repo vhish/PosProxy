@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Hubtel.PosProxy.Models.Dtos;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -50,6 +51,8 @@ namespace Hubtel.PosProxy.Models.Requests
         public string OfflineGuid { get; set; }
         
         public virtual ICollection<OrderItem> OrderItems { get; set; }
+
+        public virtual ICollection<PaymentRequestDto> Payments { get; } = new List<PaymentRequestDto>();
     }
 
     public class OrderItem

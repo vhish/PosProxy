@@ -41,10 +41,7 @@ namespace Hubtel.PosProxy.Services
             var response = await _merchantAccountService.CheckTransactionStatusAsync(paymentRequest, accountId).ConfigureAwait(false);
             if(response != null)
             {
-                if (response.Data.Data[0].TransactionStatus.ToLower().Equals("success"))
-                    paymentRequest.Status = En.PaymentStatus.SUCCESSFUL;
-                else if (response.Data.Data[0].TransactionStatus.ToLower().Equals("failed"))
-                    paymentRequest.Status = En.PaymentStatus.FAILED;
+                paymentRequest.SetStatus(response.Data.Data[0].TransactionStatus);
 
                 var orderResponse = await RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
                 if (orderResponse.Success)
