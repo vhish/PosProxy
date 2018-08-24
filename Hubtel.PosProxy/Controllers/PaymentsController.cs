@@ -65,6 +65,9 @@ namespace Hubtel.PosProxy.Controllers
                 return BadRequest(Responses.ErrorResponse<PaymentRequest>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
             }
 
+            //call a function that assigns the customer, branch and employee from an order to the payment if empty on the payment
+            payload = setCustomerDataOnPayment(payload);
+
             var payment = payload.Payments.FirstOrDefault();
             if (payment == null)
             {
@@ -186,6 +189,37 @@ namespace Hubtel.PosProxy.Controllers
                 }
             }
             return paymentRequest;
+        }
+
+        private OrderRequestDto setCustomerDataOnPayment(OrderRequestDto payload)
+        {
+            var payment = payload.Payments.FirstOrDefault();
+            if (payment == null)
+            {
+                return payload;
+            }
+            if (String.IsNullOrEmpty(payment.CustomerName))
+            {
+                payment.CustomerName = payload.CustomerName;
+            }
+            if (String.IsNullOrEmpty(payment.BranchName))
+            {
+                payment.BranchName = payload.BranchName;
+            }
+            if (String.IsNullOrEmpty(payment.BranchId))
+            {
+                payment.BranchId = payload.BranchId;
+            }
+            if (String.IsNullOrEmpty(payment.EmployeeName))
+            {
+                payment.EmployeeName = payload.EmployeeName;
+            }
+            if (String.IsNullOrEmpty(payment.EmployeeId))
+            {
+                payment.EmployeeId = payload.EmployeeId;
+            }
+
+            return payload;
         }
     }
 }
