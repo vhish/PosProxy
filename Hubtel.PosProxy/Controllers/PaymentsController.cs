@@ -68,7 +68,7 @@ namespace Hubtel.PosProxy.Controllers
             //call a function that assigns the customer, branch and employee from an order to the payment if empty on the payment
             payload = setCustomerDataOnPayment(payload);
 
-            var payment = payload.Payments.FirstOrDefault();
+            var payment = payload?.Payments?.FirstOrDefault();
             if (payment == null)
             {
                 ModelState.AddModelError("payment", "There is no payment attached to the order");
@@ -193,7 +193,7 @@ namespace Hubtel.PosProxy.Controllers
 
         private OrderRequestDto setCustomerDataOnPayment(OrderRequestDto payload)
         {
-            var payment = payload.Payments.FirstOrDefault();
+            var payment = payload?.Payments?.FirstOrDefault();
             if (payment == null)
             {
                 return payload;
