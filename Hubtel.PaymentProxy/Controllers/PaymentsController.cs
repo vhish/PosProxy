@@ -68,7 +68,7 @@ namespace Hubtel.PaymentProxy.Controllers
             //call a function that assigns the customer, branch and employee from an order to the payment if empty on the payment
             payload = setCustomerDataOnPayment(payload);
 
-            var payment = payload?.Payments?.FirstOrDefault();
+            var payment = payload?.Payment;
             if (payment == null)
             {
                 ModelState.AddModelError("payment", "There is no payment attached to the order");
@@ -91,11 +91,7 @@ namespace Hubtel.PaymentProxy.Controllers
                 return BadRequest(orderResult);
             }
             payment.OrderId = orderResult.Data.Id;
-            /*foreach(var payment in payload.Payments)
-            {
-                payment.OrderId = orderResult.Data.Id;
-            }*/
-
+            
             var paymentRequest = _mapper.Map<PaymentRequest>(payment);
             paymentRequest = await _paymentRequestRepository.AddAsync(paymentRequest).ConfigureAwait(false);
 
@@ -111,7 +107,8 @@ namespace Hubtel.PaymentProxy.Controllers
             processPaymentResult.Data = null;
             return BadRequest(processPaymentResult);
         }
-        
+
+        [ApiExplorerSettings(IgnoreApi = true)]
         [ServiceFilter(typeof(IpAttributeFilter))]
         [AllowAnonymous]
         [HttpPost, Route("card-callback")]
@@ -129,6 +126,7 @@ namespace Hubtel.PaymentProxy.Controllers
             return Ok();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [ServiceFilter(typeof(IpAttributeFilter))]
         [AllowAnonymous]
         [HttpPost, Route("momo-callback")]
@@ -149,6 +147,7 @@ namespace Hubtel.PaymentProxy.Controllers
             return Ok();
         }
 
+        [ApiExplorerSettings(IgnoreApi = true)]
         [ServiceFilter(typeof(IpAttributeFilter))]
         [AllowAnonymous]
         [HttpPost, Route("hubtelme-callback")]
@@ -172,8 +171,6 @@ namespace Hubtel.PaymentProxy.Controllers
 
         private PaymentRequest FinalizePaymentRequest(string clientReference, string transactionId, string responseCode)
         {
-            /*var paymentRequest = _paymentRequestRepository.Find(x => x.ClientReference == clientReference && 
-            x.TransactionId == transactionId);*/
             var paymentRequest = _paymentRequestRepository.Find(x => x.ClientReference == clientReference);
             if (paymentRequest != null)
             {
@@ -193,7 +190,7 @@ namespace Hubtel.PaymentProxy.Controllers
 
         private OrderRequestDto setCustomerDataOnPayment(OrderRequestDto payload)
         {
-            var payment = payload?.Payments?.FirstOrDefault();
+            var payment = payload?.Payment;
             if (payment == null)
             {
                 return payload;

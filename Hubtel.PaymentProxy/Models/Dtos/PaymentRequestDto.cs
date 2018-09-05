@@ -48,9 +48,9 @@ namespace Hubtel.PaymentProxy.Models.Dtos
 
         public string BranchName { get; set; }
 
-        public bool IsRefund { get; set; }
+        //public bool IsRefund { get; set; }
 
-        public bool IsSuccessful { get; set; }
+        //public bool IsSuccessful { get; set; }
 
         public string ReceiptNumber { get; set; }
 

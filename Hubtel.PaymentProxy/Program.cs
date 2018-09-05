@@ -17,7 +17,7 @@ namespace Hubtel.PaymentProxy
     {
         public static IConfiguration Configuration { get; } = new ConfigurationBuilder()
             .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json", false, true)
+            .AddJsonFile("appsettings.json", true, true)
             .AddJsonFile("hosting.json", true, true)
             .AddJsonFile(
                 $"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json",

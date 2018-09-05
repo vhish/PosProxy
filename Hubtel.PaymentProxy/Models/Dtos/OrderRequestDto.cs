@@ -42,7 +42,7 @@ namespace Hubtel.PaymentProxy.Models.Dtos
 
         public decimal? DiscountAmount { get; set; }
 
-        //public decimal Subtotal { get; set; }
+        public decimal Subtotal { get; set; }
 
         public decimal TotalAmountDue { get; set; }
 
@@ -53,7 +53,8 @@ namespace Hubtel.PaymentProxy.Models.Dtos
         [StringLength(40)]
         public string OfflineGuid { get; set; }
 
-        public virtual ICollection<PaymentRequestDto> Payments { get; set; }
         public virtual ICollection<OrderItemDto> OrderItems { get; set; }
+
+        public virtual PaymentRequestDto Payment { get; set; }
     }
 }

@@ -135,7 +135,7 @@ namespace Hubtel.PaymentProxy
                     .Build()));
             })
             .AddAuthorization()
-            .AddJsonFormatters(b => b.ContractResolver = new DefaultContractResolver())
+            .AddJsonFormatters(b => b.ContractResolver = new CamelCasePropertyNamesContractResolver())
             .AddApiExplorer();
 
             services.Configure<ForwardedHeadersOptions>(options =>
@@ -146,8 +146,15 @@ namespace Hubtel.PaymentProxy
 
             services.AddSwaggerGen(c =>
             {
-                c.SwaggerDoc("v1", new Info { Title = "POS Proxy API", Version = "v1" });
-                c.OperationFilter<AuthorizationInputOperationFilter>();
+                c.SwaggerDoc("v1", new Info { Title = "Payment Proxy API V1", Version = "v1" });
+                c.OperationFilter<SecurityRequirementsOperationFilter>();
+                c.AddSecurityDefinition("oauth2", new ApiKeyScheme
+                {
+                    Description = "Standard Authorization header using the Bearer scheme. Example: \"bearer {token}\"",
+                    In = "header",
+                    Name = "Authorization",
+                    Type = "apiKey"
+                });
                 c.OperationFilter<AddFileParamTypesOperationFilter>();
                 c.IncludeXmlComments(SwaggerConfigHelper.XmlCommentsFilePath);
             });
@@ -242,7 +249,7 @@ namespace Hubtel.PaymentProxy
             app.UseSwaggerUI(c =>
             {
                 string swaggerJsonBasePath = string.IsNullOrWhiteSpace(c.RoutePrefix) ? "." : "..";
-                c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", "POS Proxy API V1");
+                c.SwaggerEndpoint($"{swaggerJsonBasePath}/swagger/v1/swagger.json", "Payment Proxy API V1");
             });
         }
     }

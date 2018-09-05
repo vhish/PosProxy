@@ -9,6 +9,7 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <Compile Remove="Controllers\ProxyController.cs" />
     <Compile Remove="Controllers\SyncOrdersController.cs" />
   </ItemGroup>
 
@@ -52,6 +53,12 @@
 
   <ItemGroup>
     <DocFileItem Remove="Hubtel.PaymentProxy.xml" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Update="appsettings.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>
