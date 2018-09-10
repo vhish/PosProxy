@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.DependencyInjection;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
@@ -84,15 +85,9 @@ namespace Hubtel.PaymentProxy.Controllers
             if (!ModelState.IsValid) return BadRequest(Responses.ErrorResponse<PaymentRequest>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
 
             var orderRequest = _mapper.Map<OrderRequest>(payload);
-            var orderResult = await _unifiedSalesService.RecordOrderAsync(orderRequest, accountId).ConfigureAwait(false);
-            if (!orderResult.Success)
-            {
-                orderResult.Data = null;
-                return BadRequest(orderResult);
-            }
-            payment.OrderId = orderResult.Data.Id;
             
             var paymentRequest = _mapper.Map<PaymentRequest>(payment);
+            paymentRequest.OrderRequestDoc = JsonConvert.SerializeObject(orderRequest);
             paymentRequest = await _paymentRequestRepository.AddAsync(paymentRequest).ConfigureAwait(false);
 
             var paymentTypeClassName = $"Hubtel.PaymentProxy.Services.{caseFormat.ToTitleCase(payment.PaymentType.ToLower())}PaymentService";
@@ -120,7 +115,11 @@ namespace Hubtel.PaymentProxy.Controllers
                     payload.ResponseCode);
                 if(paymentRequest != null)
                 {
-                    var response = await _cardPaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                    if (paymentRequest.Status.Equals(En.PaymentStatus.SUCCESSFUL) || paymentRequest.Status.Equals(En.PaymentStatus.FAILED))
+                    {
+                        paymentRequest.MergeCardCallbackData(payload);
+                        var response = await _cardPaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                    }
                 }
             }
             return Ok();
@@ -140,6 +139,7 @@ namespace Hubtel.PaymentProxy.Controllers
                 {
                     if (paymentRequest.Status.Equals(En.PaymentStatus.SUCCESSFUL) || paymentRequest.Status.Equals(En.PaymentStatus.FAILED))
                     {
+                        paymentRequest.MergeMomoCallbackData(payload);
                         var response = await _momoPaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
                     }
                 }
@@ -161,6 +161,7 @@ namespace Hubtel.PaymentProxy.Controllers
                 {
                     if (paymentRequest.Status.Equals(En.PaymentStatus.SUCCESSFUL) || paymentRequest.Status.Equals(En.PaymentStatus.FAILED))
                     {
+                        paymentRequest.MergeHubtelMeCallbackData(payload);
                         var response = await _hubtelMePaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
                     }
                 }

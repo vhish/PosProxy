@@ -5,6 +5,7 @@ using Hubtel.PaymentProxy.Models.Responses;
 using Hubtel.PaymentProxyData.Core;
 using Hubtel.PaymentProxyData.EntityModels;
 using Hubtel.PaymentProxyData.Repositories;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -29,11 +30,31 @@ namespace Hubtel.PaymentProxy.Services
         public async Task<HubtelPosProxyResponse<PaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest)
         {
             var accountId = paymentRequest.AccountId;
-
+            var orderResult = await RecordOrderAsync(paymentRequest).ConfigureAwait(false);
+            if (!orderResult.Success)
+            {
+                return new HubtelPosProxyResponse<PaymentResponse>
+                {
+                    Code = orderResult.Code,
+                    Message = orderResult.Message,
+                    Success = orderResult.Success,
+                    Data = null,
+                    Errors = orderResult.Errors
+                };
+            }
+            paymentRequest.OrderId = orderResult.Data.Id;
             //var orderPaymentRequest = OrderPaymentRequest.ToOrderPaymentRequest(paymentRequest);
             var response = await _unifiedSalesService.RecordPaymentAsync(paymentRequest, accountId).ConfigureAwait(false);
             
             return response;
+        }
+
+        public async Task<HubtelPosProxyResponse<OrderResponse>> RecordOrderAsync(PaymentRequest paymentRequest)
+        {
+            var accountId = paymentRequest.AccountId;
+            var orderRequest = JsonConvert.DeserializeObject<OrderRequest>(paymentRequest.OrderRequestDoc);
+            var orderResult = await _unifiedSalesService.RecordOrderAsync(orderRequest, accountId).ConfigureAwait(false);
+            return orderResult;
         }
     }
 

@@ -1,5 +1,4 @@
-﻿using FluentValidation.Attributes;
-using Hubtel.PaymentProxy.Models.Validators;
+﻿using Hubtel.PaymentProxy.Models.Validators;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;

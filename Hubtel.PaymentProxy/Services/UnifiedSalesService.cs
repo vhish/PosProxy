@@ -33,7 +33,7 @@ namespace Hubtel.PaymentProxy.Services
 
         public async Task<HubtelPosProxyResponse<PaymentResponse>> RecordPaymentAsync(PaymentRequest paymentRequest, string accountId)
         {
-            var url = $"{_unifiedSalesConfiguration.BaseUrl}/payments"; ///{orderPaymentRequest.SalesOrderId}/payment";
+            var url = $"{_unifiedSalesConfiguration.BaseUrl}/payments";
 
             var authToken = HubtelBasicAuthHelper.GenerateToken(_unifiedSalesConfiguration.ApiKey, accountId);
 
