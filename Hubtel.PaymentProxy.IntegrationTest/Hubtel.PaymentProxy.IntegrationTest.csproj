@@ -21,6 +21,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Hubtel.PaymentProxyData\Hubtel.PaymentProxyData.csproj" />
     <ProjectReference Include="..\Hubtel.PaymentProxy\Hubtel.PaymentProxy.csproj" />
   </ItemGroup>
 

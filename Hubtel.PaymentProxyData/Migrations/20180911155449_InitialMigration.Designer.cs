@@ -10,14 +10,14 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Hubtel.PaymentProxyData.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20180815134928_InitialMigration")]
+    [Migration("20180911155449_InitialMigration")]
     partial class InitialMigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
-                .HasAnnotation("ProductVersion", "2.1.1-rtm-30846")
+                .HasAnnotation("ProductVersion", "2.1.2-rtm-30932")
                 .HasAnnotation("Relational:MaxIdentifierLength", 128)
                 .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
@@ -63,8 +63,6 @@ namespace Hubtel.PaymentProxyData.Migrations
 
                     b.Property<string>("ExternalTransactionId");
 
-                    b.Property<bool>("IsRefund");
-
                     b.Property<bool>("IsSuccessful");
 
                     b.Property<string>("MomoChannel");
@@ -79,6 +77,8 @@ namespace Hubtel.PaymentProxyData.Migrations
                         .HasMaxLength(50);
 
                     b.Property<Guid?>("OrderId");
+
+                    b.Property<string>("OrderRequestDoc");
 
                     b.Property<DateTime?>("PaymentDate");
 

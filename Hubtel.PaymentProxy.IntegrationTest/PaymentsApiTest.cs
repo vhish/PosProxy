@@ -1,7 +1,6 @@
 using Hubtel.PaymentProxy.IntegrationTest.Data;
 using Hubtel.PaymentProxyData.EntityModels;
 using Newtonsoft.Json;
-using System;
 using System.Net;
 using System.Net.Http;
 using System.Text;

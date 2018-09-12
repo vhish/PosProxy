@@ -27,7 +27,7 @@ namespace Hubtel.PaymentProxy.BackgroundServices
             _logger.LogInformation(
                 "Consume Scoped Service Hosted Service is starting.");
 
-            DoWork(cancellationToken);
+            //DoWork(cancellationToken);
 
             return Task.CompletedTask;
         }

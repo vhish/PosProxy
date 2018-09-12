@@ -42,12 +42,12 @@ namespace Hubtel.PaymentProxyData.Migrations
                     CustomerName = table.Column<string>(nullable: true),
                     BranchId = table.Column<string>(nullable: true),
                     BranchName = table.Column<string>(nullable: true),
-                    IsRefund = table.Column<bool>(nullable: false),
                     IsSuccessful = table.Column<bool>(nullable: false),
                     ReceiptNumber = table.Column<string>(nullable: true),
                     OfflineGuid = table.Column<string>(maxLength: 50, nullable: true),
                     ClientReference = table.Column<string>(maxLength: 255, nullable: true),
-                    Status = table.Column<string>(nullable: true)
+                    Status = table.Column<string>(nullable: true),
+                    OrderRequestDoc = table.Column<string>(nullable: true)
                 },
                 constraints: table =>
                 {
