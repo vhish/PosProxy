@@ -73,7 +73,7 @@ namespace Hubtel.PaymentProxy.Services
                 return Responses.SuccessResponse(StatusMessage.Created, paymentRequest, ResponseCodes.SUCCESS);
             }
             _logger.LogError("Momo:ProcessPayment: request failed.");
-            return Responses.ErrorResponse(response.Errors, new PaymentRequest(), response.Data.Data.Description, ResponseCodes.EXTERNAL_ERROR);
+            return Responses.ErrorResponse(response.Errors, new PaymentRequest(), response.Data?.Data?.Description, ResponseCodes.EXTERNAL_ERROR);
         }
 
     }

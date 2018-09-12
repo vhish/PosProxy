@@ -15,13 +15,12 @@ namespace Hubtel.PaymentProxy.Models.Validators
         {
             _paymentTypeConfiguration = paymentTypeConfiguration;
 
-            RuleFor(vm => vm.PaymentType).NotEmpty();
+            RuleFor(vm => vm.Description).NotNull().NotEmpty();
+            RuleFor(vm => vm.PaymentType).NotNull().NotEmpty();
             RuleFor(vm => vm.PaymentType).Must(HaveValidPaymentType)
                 .WithMessage("The payment type is not valid");
             RuleFor(vm => vm.AmountPaid).NotNull().NotEmpty();
             RuleFor(vm => vm.PosDeviceId).NotNull().NotEmpty();
-            //RuleFor(vm => vm.OrderId).NotNull().NotEmpty();
-            //RuleFor(vm => vm.ChargeCustomer).NotNull().NotEmpty();
             RuleFor(vm => vm.AmountPaid).GreaterThanOrEqualTo(0);
             RuleFor(vm => vm.MomoPhoneNumber).Must(HaveValidCustomerMsisdn).When(x => isMsisdnRequired(x.PaymentType));
             RuleFor(vm => vm.MomoPhoneNumber).Must(HaveValidChannel).When(x => isMsisdnRequired(x.PaymentType));
@@ -35,6 +34,9 @@ namespace Hubtel.PaymentProxy.Models.Validators
 
         private bool HaveValidPaymentType(string paymentType)
         {
+            if (string.IsNullOrEmpty(paymentType))
+                return false;
+
             var paymentTypeNames = _paymentTypeConfiguration.PaymentTypes.Select(x => x.Type.ToLower()).ToList();
             if (paymentTypeNames.Contains(paymentType.ToLower()))
             {
@@ -63,6 +65,9 @@ namespace Hubtel.PaymentProxy.Models.Validators
 
         private bool isMsisdnRequired(string paymentTypeName)
         {
+            if (string.IsNullOrEmpty(paymentTypeName))
+                return false;
+
             var paymentType = _paymentTypeConfiguration.PaymentTypes
                 .FirstOrDefault(x => x.Type.ToLower() == paymentTypeName.ToLower());
 

@@ -96,6 +96,7 @@ namespace Hubtel.PaymentProxy.Controllers
             var processPaymentResult = await paymentService.ProcessPayment(paymentRequest).ConfigureAwait(false);
             if (processPaymentResult.Success)
             {
+                processPaymentResult.Data.OrderRequestDoc = null;
                 return Ok(processPaymentResult);
             }
             await _paymentRequestRepository.DeleteByClientReferenceAsync(paymentRequest.ClientReference).ConfigureAwait(false);

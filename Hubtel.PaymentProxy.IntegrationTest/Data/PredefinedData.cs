@@ -25,11 +25,18 @@ namespace Hubtel.PaymentProxy.IntegrationTest.Data
                 {
                     ItemId = "1q1q2w3e",
                     Name = "Gari",
-                    UnitPrice = 10.00M
+                    UnitPrice = 10.00M,
+                    Quantity = 1
                 }
             },
             Payment = new PaymentRequestDto
             {
+                Description = "test",
+                ChargeCustomer = false,
+                MomoPhoneNumber = "233244377919",
+                MomoChannel = "mtn-gh",
+                PaymentType = "MOMO",
+                PosDeviceId = "12345",
                 AmountPaid = 108.00M,
                 OfflineGuid = Guid.NewGuid().ToString()
             }
@@ -53,7 +60,8 @@ namespace Hubtel.PaymentProxy.IntegrationTest.Data
                 {
                     ItemId = "1q1q2w3e",
                     Name = "Gari",
-                    UnitPrice = 10.00M
+                    UnitPrice = 10.00M,
+                    Quantity = 1
                 }
             }
         };
