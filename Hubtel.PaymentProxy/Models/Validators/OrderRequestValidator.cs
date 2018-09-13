@@ -11,7 +11,7 @@ namespace Hubtel.PaymentProxy.Models.Validators
     {
         public OrderRequestValidator()
         {
-            RuleFor(vm => vm.PosDeviceId).NotNull().NotEmpty();
+            //RuleFor(vm => vm.PosDeviceId).NotNull().NotEmpty();
             RuleFor(vm => vm.IntegrationChannel).NotNull().NotEmpty();
             RuleFor(vm => vm.OrderItems).NotNull().NotEmpty();
             RuleFor(x => x.EmployeeId).NotEmpty().When(x => !string.IsNullOrEmpty(x.EmployeeName.Trim()));

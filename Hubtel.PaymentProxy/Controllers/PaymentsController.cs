@@ -5,8 +5,10 @@ using Hubtel.PaymentProxy.Extensions;
 using Hubtel.PaymentProxy.Filters;
 using Hubtel.PaymentProxy.Helpers;
 using Hubtel.PaymentProxy.Models;
+using Hubtel.PaymentProxy.Models.ApiResponses;
 using Hubtel.PaymentProxy.Models.Dtos;
-using Hubtel.PaymentProxy.Models.Requests;
+using Hubtel.PaymentProxy.Models.ApiRequests;
+using Hubtel.PaymentProxy.Models.ApiResponses;
 using Hubtel.PaymentProxy.Models.Validators;
 using Hubtel.PaymentProxy.Services;
 using Hubtel.PaymentProxyData.Constants;
@@ -38,11 +40,14 @@ namespace Hubtel.PaymentProxy.Controllers
         private readonly IServiceProvider _provider;
         private readonly IPaymentTypeConfiguration _paymentTypeConfiguration;
         private readonly IUnifiedSalesService _unifiedSalesService;
+        private readonly IMerchantAccountService _merchantAccountService;
+        private readonly ICustomerProfileService _customerProfileService;
 
         public PaymentsController(ICardPaymentService cardPaymentService,
             IMomoPaymentService momoPaymentService, IMapper mapper,
             IPaymentRequestRepository paymentRequestRepository, IServiceProvider provider,
-            IPaymentTypeConfiguration paymentTypeConfiguration, IUnifiedSalesService unifiedSalesService)
+            IPaymentTypeConfiguration paymentTypeConfiguration, IUnifiedSalesService unifiedSalesService,
+            IMerchantAccountService merchantAccountService, ICustomerProfileService customerProfileService)
         {
             _mapper = mapper;
             _paymentRequestRepository = paymentRequestRepository;
@@ -51,6 +56,56 @@ namespace Hubtel.PaymentProxy.Controllers
             _provider = provider;
             _paymentTypeConfiguration = paymentTypeConfiguration;
             _unifiedSalesService = unifiedSalesService;
+            _merchantAccountService = merchantAccountService;
+            _customerProfileService = customerProfileService;
+        }
+
+        [BenchmarkAttributeFilter, HttpPost, Route("momo-fee")]
+        public async Task<IActionResult> GetMomoFees([FromBody] FeesRequestDto payload)
+        {
+            if(payload == null)
+            {
+                ModelState.AddModelError("fees", "The fees request cannot be blank");
+                return BadRequest(Responses.ErrorResponse<FeesResponseDto>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
+            }
+
+            var feesValidator = new FeesRequestValidator();
+            feesValidator.Validate(payload).AddToModelState(ModelState, null);
+            if (!ModelState.IsValid) return BadRequest(Responses.ErrorResponse<FeesResponseDto>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
+
+            var phone = payload.MomoPhoneNumber.AsPhoneNumber();
+            if (phone == null)
+            {
+                ModelState.AddModelError("phone", "The phone number is not valid");
+                return BadRequest(Responses.ErrorResponse<FeesResponseDto>(ModelState.ToErrors(), StatusMessage.ValidationErrors, ResponseCodes.VALIDATION_ERRORS));
+            }
+
+            var accountId = UserHelper.GetAccountId(User);
+
+            var customer = await _customerProfileService.GetCustomerProfile(phone).ConfigureAwait(false);
+
+            if(customer.Channel == null)
+            {
+                return NotFound(Responses.ErrorResponse(null, new FeesResponseDto(), "The phone number network code was not found", ResponseCodes.NOT_FOUND));
+            }
+
+            var fees = await _merchantAccountService.GetMomoFeesAsync(payload.Amount, customer.Channel, 
+                payload.ChargeCustomer.Value, accountId).ConfigureAwait(false);
+
+            if(fees == null)
+            {
+                return NotFound(Responses.ErrorResponse(null, new FeesResponseDto(), "Error getting fees", ResponseCodes.EXTERNAL_ERROR));
+            }
+
+            var feeResponse = new FeesResponseDto
+            {
+                Amount = payload.Amount,
+                ChargeCustomer = payload.ChargeCustomer.Value,
+                MomoPhoneNumber = payload.MomoPhoneNumber,
+                CustomerProfile = customer,
+                MomoFee = fees.Data
+            };
+            return Ok(Responses.SuccessResponse(StatusMessage.Found, feeResponse, ResponseCodes.SUCCESS));
         }
 
         [BenchmarkAttributeFilter, HttpPost, Route("")]

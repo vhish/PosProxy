@@ -4,5 +4,26 @@
         <name>Hubtel.PaymentProxy</name>
     </assembly>
     <members>
+        <member name="M:Hubtel.PaymentProxy.Services.CustomerProfileService.GetCustomerProfile(System.String)">
+            <summary>
+            Get the Customer profile 
+            </summary>
+            <param name="phoneNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Hubtel.PaymentProxy.Services.CustomerProfileService.MnpLookupAsync(System.String)">
+            <summary>
+            Mnp Lookup
+            </summary>
+            <param name="phoneNumber"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Hubtel.PaymentProxy.Services.CustomerProfileService.NameLookup(System.String)">
+            <summary>
+            Namelookup
+            </summary>
+            <param name="phoneNumber"></param>
+            <returns></returns>
+        </member>
     </members>
 </doc>

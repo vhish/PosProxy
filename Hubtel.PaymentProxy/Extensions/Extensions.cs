@@ -1,4 +1,4 @@
-﻿using Hubtel.PaymentProxy.Models.Responses;
+﻿using Hubtel.PaymentProxy.Models.ApiResponses;
 using Microsoft.AspNetCore.Mvc.ModelBinding;
 using Newtonsoft.Json;
 using System;

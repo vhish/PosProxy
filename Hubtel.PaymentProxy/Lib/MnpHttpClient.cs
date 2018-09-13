@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,12 +12,12 @@ using System.Threading.Tasks;
 
 namespace Hubtel.PaymentProxy.Lib
 {
-    public sealed class MerchantAccountHttpClientBase
+    public sealed class MnpHttpClientBase
     {
         private static volatile HttpClient instance;
         private static object syncRoot = new object();
 
-        private MerchantAccountHttpClientBase() { }
+        private MnpHttpClientBase() { }
 
         public static HttpClient Instance
         {
@@ -30,9 +31,8 @@ namespace Hubtel.PaymentProxy.Lib
                         {
                             instance = new HttpClient
                             {
-                                //Timeout = TimeSpan.FromSeconds(10)
+                                //Timeout = TimeSpan.FromSeconds(10),
                             };
-
                         }
 
                     }
@@ -44,15 +44,28 @@ namespace Hubtel.PaymentProxy.Lib
 
     }
 
-    public class MerchantAccountHttpClient : IMerchantAccountHttpClient
+    public class MnpHttpClient : IMnpHttpClient
     {
         private HttpClient _httpClient;
         private readonly ILogger _logger;
+        private readonly string _basicAuth;
+        private readonly int _timeout;
 
-        public MerchantAccountHttpClient(ILogger<MerchantAccountHttpClient> logger)
+        public MnpHttpClient(ILogger<MnpHttpClient> logger, IConfiguration configuration)
         {
-            _httpClient = MerchantAccountHttpClientBase.Instance;
+            _httpClient = MnpHttpClientBase.Instance;
             _logger = logger;
+
+            //_timeout = Convert.ToInt32(configuration["MnpApi:TimeoutSeconds"]);
+            _basicAuth = Convert.ToBase64String(
+                Encoding.ASCII.GetBytes($"{configuration["MnpApi:ClientId"]}:{configuration["MnpApi:ClientSecret"]}"));
+            _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Basic", _basicAuth);
+            //_httpClient.Timeout = TimeSpan.FromSeconds(_timeout);
+        }
+
+        public HttpClient GetHttpClientBase()
+        {
+            return _httpClient;
         }
 
         public async Task<HttpResponseMessage> PutAsync<T>(string requestUri, T payload,
@@ -74,7 +87,7 @@ namespace Hubtel.PaymentProxy.Lib
         }
 
         public async Task<HttpResponseMessage> PostAsync<T>(string requestUri, T payload,
-            string authorizationScheme, string token)
+            string authorizationScheme = "", string token = "")
         {
             string postData = JsonConvert.SerializeObject(payload);
             HttpContent httpContent = new StringContent(postData, Encoding.UTF8, "application/json");
@@ -91,7 +104,7 @@ namespace Hubtel.PaymentProxy.Lib
             return response;
         }
 
-        public async Task<HttpResponseMessage> GetAsync(string requestUri, string authorizationScheme, string token)
+        public async Task<HttpResponseMessage> GetAsync(string requestUri, string authorizationScheme = "", string token = "")
         {
             var response = await MakeGetRequestAsync(requestUri, authorizationScheme, token);
 
@@ -123,8 +136,8 @@ namespace Hubtel.PaymentProxy.Lib
         public async Task<HttpResponseMessage> MakePutRequestAsync(string requestUri, HttpContent httpContent,
             string authorizationScheme, string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(authorizationScheme, token);
+            if (!string.IsNullOrEmpty(authorizationScheme) && !string.IsNullOrEmpty(token))
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(authorizationScheme, token);
             var response = await _httpClient.PutAsync(requestUri, httpContent);
             return response;
         }
@@ -132,9 +145,9 @@ namespace Hubtel.PaymentProxy.Lib
         public async Task<HttpResponseMessage> MakePostRequestAsync(string requestUri, HttpContent httpContent,
             string authorizationScheme, string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(authorizationScheme, token);
-            _httpClient.DefaultRequestHeaders.Add("X_CREATE_INVOICE", "false");
+            if (!string.IsNullOrEmpty(authorizationScheme) && !string.IsNullOrEmpty(token))
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue(authorizationScheme, token);
             var response = await _httpClient.PostAsync(requestUri, httpContent);
             return response;
         }
@@ -142,8 +155,9 @@ namespace Hubtel.PaymentProxy.Lib
         private async Task<HttpResponseMessage> MakeGetRequestAsync(string requestUri, string authorizationScheme,
             string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(authorizationScheme, token);
+            if (!string.IsNullOrEmpty(authorizationScheme) && !string.IsNullOrEmpty(token))
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue(authorizationScheme, token);
             var response = await _httpClient.GetAsync(requestUri);
             return response;
         }
@@ -151,20 +165,22 @@ namespace Hubtel.PaymentProxy.Lib
         private async Task<HttpResponseMessage> MakeDeleteRequestAsync(string requestUri, string authorizationScheme,
             string token)
         {
-            _httpClient.DefaultRequestHeaders.Authorization =
-                new AuthenticationHeaderValue(authorizationScheme, token);
+            if (!string.IsNullOrEmpty(authorizationScheme) && !string.IsNullOrEmpty(token))
+                _httpClient.DefaultRequestHeaders.Authorization =
+                    new AuthenticationHeaderValue(authorizationScheme, token);
             var response = await _httpClient.DeleteAsync(requestUri);
             return response;
         }
     }
 
-    public interface IMerchantAccountHttpClient
+    public interface IMnpHttpClient
     {
         Task<HttpResponseMessage> PutAsync<T>(string requestUri, T payload,
             string authorizationScheme, string token);
         Task<HttpResponseMessage> PostAsync<T>(string requestUri, T payload,
-            string authorizationScheme, string token);
-        Task<HttpResponseMessage> GetAsync(string requestUri, string authorizationScheme, string token);
+            string authorizationScheme = "", string token = "");
+        Task<HttpResponseMessage> GetAsync(string requestUri, string authorizationScheme = "", string token = "");
         Task<HttpResponseMessage> DeleteAsync(string requestUri, string authorizationScheme, string token);
+        HttpClient GetHttpClientBase();
     }
 }

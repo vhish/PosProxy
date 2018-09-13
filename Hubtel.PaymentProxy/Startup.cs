@@ -105,6 +105,8 @@ namespace Hubtel.PaymentProxy
             services.AddSingleton<IProxyHttpClient, ProxyHttpClient>();
             services.AddSingleton<IMerchantAccountHttpClient, MerchantAccountHttpClient>();
             services.AddSingleton<IUnifiedSalesHttpClient, UnifiedSalesHttpClient>();
+            services.AddSingleton<IMnpHttpClient, MnpHttpClient>();
+            services.AddSingleton<IProfilerHttpClient, ProfilerHttpClient>();
 
             services.AddTransient<IHttpContextAccessor, HttpContextAccessor>();
             services.AddTransient<ICashPaymentService, CashPaymentService>();
@@ -116,6 +118,7 @@ namespace Hubtel.PaymentProxy
             services.AddTransient<IMerchantAccountService, MerchantAccountService>();
             services.AddTransient<IPaymentRequestRepository, PaymentRequestRepository>();
             services.AddTransient<ISalesOrderZipFileRepository, SalesOrderZipFileRepository>();
+            services.AddTransient<ICustomerProfileService, CustomerProfileService>();
 
             //services.AddTransient<IValidator<CreatePaymentRequestDto>, PaymentRequestValidator>();
 

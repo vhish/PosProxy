@@ -65,5 +65,12 @@ namespace Hubtel.PaymentProxy.IntegrationTest.Data
                 }
             }
         };
+
+        public static FeesRequestDto FeesRequest = new FeesRequestDto
+        {
+            Amount = 100.00M,
+            ChargeCustomer = false,
+            MomoPhoneNumber = "0244377919"
+        };
     }
 }

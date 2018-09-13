@@ -1,7 +1,7 @@
 ﻿using Hubtel.PaymentProxy.Extensions;
 using Hubtel.PaymentProxy.Models;
-using Hubtel.PaymentProxy.Models.Requests;
-using Hubtel.PaymentProxy.Models.Responses;
+using Hubtel.PaymentProxy.Models.ApiRequests;
+using Hubtel.PaymentProxy.Models.ApiResponses;
 using Hubtel.PaymentProxyData.Core;
 using Hubtel.PaymentProxyData.EntityModels;
 using Hubtel.PaymentProxyData.Repositories;

@@ -32,5 +32,6 @@ namespace Hubtel.PaymentProxy.Models
     {
         public string Name { get; set; }
         public bool? Requiretoken { get; set; }
+        public string NetworkCode { get; set; }
     }
 }

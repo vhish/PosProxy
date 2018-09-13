@@ -38,5 +38,26 @@ namespace Hubtel.PaymentProxy.IntegrationTest
             var ordersResponse = JsonConvert.DeserializeObject<PaymentsApiResponse<PaymentRequest>>(responseString);
             Assert.Equal("Pending", ordersResponse.Data.Status);
         }
+
+        [Fact]
+        public async Task GetMomoFeesForAmountWithCustomerNumber_ReturnsFeesAndCustomerProfiles()
+        {
+            // Arrange
+            var client = _factory.CreateClient();
+            var feesRequestDto = PredefinedData.FeesRequest;
+
+            // Act
+            client.DefaultRequestHeaders.Add("Authorization", $"hubtel-bearer ODBlNTJkN2ExY2RmNDZkOGFlNzJhNGE3NTdjNGFhOGU6eyJBY2NvdW50SWQiOiJnZW9yZ2VoYWdhbiJ9");
+            var contents = new StringContent(JsonConvert.SerializeObject(feesRequestDto), Encoding.UTF8, "application/json");
+            var response = await client.PostAsync("/api/payments/momo-fee", contents);
+
+            // Assert
+            var responseString = await response.Content.ReadAsStringAsync();
+            response.EnsureSuccessStatusCode();
+
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            var ordersResponse = JsonConvert.DeserializeObject<PaymentsApiResponse<PaymentRequest>>(responseString);
+            Assert.Equal("Pending", ordersResponse.Data.Status);
+        }
     }
 }

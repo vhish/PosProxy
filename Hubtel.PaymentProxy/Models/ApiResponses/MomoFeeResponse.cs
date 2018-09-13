@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace Hubtel.PaymentProxy.Models.Responses
+namespace Hubtel.PaymentProxy.Models.ApiResponses
 {
     public class MomoFeeResponse
     {

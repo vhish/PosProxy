@@ -1,8 +1,8 @@
 ﻿using Hubtel.PaymentProxy.Helpers;
 using Hubtel.PaymentProxy.Lib;
 using Hubtel.PaymentProxy.Models;
-using Hubtel.PaymentProxy.Models.Responses;
-using Hubtel.PaymentProxy.Models.Requests;
+using Hubtel.PaymentProxy.Models.ApiResponses;
+using Hubtel.PaymentProxy.Models.ApiRequests;
 using Hubtel.PaymentProxyData.EntityModels;
 using Microsoft.Extensions.Caching.Distributed;
 using Microsoft.Extensions.Logging;
@@ -167,18 +167,18 @@ namespace Hubtel.PaymentProxy.Services
             }
         }
 
-        public async Task<MomoFeeResponse> GetMomoFeesAsync(PaymentRequest paymentRequest, string accountId)
+        public async Task<MomoFeeResponse> GetMomoFeesAsync(decimal amount, string momoChannel, bool chargeCustomer, string accountId)
         {
             string merchantAccountNumber = await FindAccountNumberAsync(accountId).ConfigureAwait(false);
-            var url = $"{_merchantAccountConfiguration.PrivateBaseUrl}/merchants/{merchantAccountNumber}/charges/mobile/receive";
+            var url = $"{_merchantAccountConfiguration.PublicBaseUrl}/merchants/{merchantAccountNumber}/charges/mobile/receive";
 
             var authToken = HubtelBasicAuthHelper.GenerateToken(_merchantAccountConfiguration.ApiKey, accountId);
 
             var momoFeeRequest = new MomoFeeRequest
             {
-                Amount = paymentRequest.AmountPaid,
-                Channel = paymentRequest.MomoChannel,
-                FeesOnCustomer = paymentRequest.ChargeCustomer ?? true
+                Amount = amount,
+                Channel = momoChannel,
+                FeesOnCustomer = chargeCustomer
             };
 
             using (var response = await _merchantAccountHttpClient.PostAsync(url, momoFeeRequest,
@@ -289,7 +289,7 @@ namespace Hubtel.PaymentProxy.Services
         Task<HubtelPosProxyResponse<MerchantMomoResponse>> ChargeMomoAsync(PaymentRequest paymentRequest, string accountId);
         Task<HubtelPosProxyResponse<MerchantCardResponse>> ChargeCardAsync(PaymentRequest paymentRequest, string accountId);
         Task<HubtelPosProxyResponse<MerchantHubtelMeResponse>> ChargeHubtelMeAsync(PaymentRequest paymentRequest, string accountId);
-        Task<MomoFeeResponse> GetMomoFeesAsync(PaymentRequest paymentRequest, string accountId);
+        Task<MomoFeeResponse> GetMomoFeesAsync(decimal amount, string momoChannel, bool chargeCustomer, string accountId);
         Task<MomoChannelResponse> GetChannelsAsync(string accountId);
         Task<HubtelPosProxyResponse<MerchantTransactionCheckResponse>> CheckTransactionStatusAsync(PaymentRequest paymentRequest, string accountId);
         Task<HubtelPosProxyResponse<MerchantTransactionCheckResponse>> CheckHubtelMeTransactionStatusAsync(PaymentRequest paymentRequest, string accountId);

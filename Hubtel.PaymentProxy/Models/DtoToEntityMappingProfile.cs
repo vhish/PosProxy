@@ -1,6 +1,6 @@
 ﻿using AutoMapper;
 using Hubtel.PaymentProxy.Models.Dtos;
-using Hubtel.PaymentProxy.Models.Requests;
+using Hubtel.PaymentProxy.Models.ApiRequests;
 using Hubtel.PaymentProxyData.EntityModels;
 using System;
 using System.Collections.Generic;
