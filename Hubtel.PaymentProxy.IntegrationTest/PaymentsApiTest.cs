@@ -56,8 +56,8 @@ namespace Hubtel.PaymentProxy.IntegrationTest
             response.EnsureSuccessStatusCode();
 
             Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-            var ordersResponse = JsonConvert.DeserializeObject<PaymentsApiResponse<PaymentRequest>>(responseString);
-            Assert.Equal("Pending", ordersResponse.Data.Status);
+            //var ordersResponse = JsonConvert.DeserializeObject<PaymentsApiResponse<PaymentRequest>>(responseString);
+            //Assert.Equal("Pending", ordersResponse.Data.Status);
         }
     }
 }
