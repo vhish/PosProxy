@@ -85,7 +85,7 @@ namespace Hubtel.PaymentProxy.Services
                 {
                     Error = HandleDeserializationError
                 });
-                if(error.Code == 4000)
+                if(error != null && error.Code == 4000)
                 {
                     var validationError = JsonConvert.DeserializeObject<UnifiedSalesValidationErrorResponse>(respData, new JsonSerializerSettings
                     {

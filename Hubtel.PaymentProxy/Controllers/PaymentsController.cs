@@ -175,6 +175,10 @@ namespace Hubtel.PaymentProxy.Controllers
                     {
                         paymentRequest.MergeCardCallbackData(payload);
                         var response = await _cardPaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                        if (response.Code == 2000)
+                        {
+                            await _paymentRequestRepository.UpdateStatusAsync(paymentRequest).ConfigureAwait(false);
+                        }
                     }
                 }
             }
@@ -197,6 +201,10 @@ namespace Hubtel.PaymentProxy.Controllers
                     {
                         paymentRequest.MergeMomoCallbackData(payload);
                         var response = await _momoPaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                        if(response.Code == 2000)
+                        {
+                            await _paymentRequestRepository.UpdateStatusAsync(paymentRequest).ConfigureAwait(false);
+                        }
                     }
                 }
             }
@@ -219,6 +227,10 @@ namespace Hubtel.PaymentProxy.Controllers
                     {
                         paymentRequest.MergeHubtelMeCallbackData(payload);
                         var response = await _hubtelMePaymentService.RecordPaymentAsync(paymentRequest).ConfigureAwait(false);
+                        if (response.Code == 2000)
+                        {
+                            await _paymentRequestRepository.UpdateStatusAsync(paymentRequest).ConfigureAwait(false);
+                        }
                     }
                 }
                     
