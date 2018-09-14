@@ -191,6 +191,7 @@ namespace Hubtel.PaymentProxy.Controllers
         [HttpPost, Route("momo-callback")]
         public async Task<IActionResult> MomoCallback([FromBody] MomoCallbackRequestDto payload)
         {
+            Console.WriteLine("MOMO payments callback has arrived");
             if(payload.Data?.ClientReference != null)
             {
                 var paymentRequest = FinalizePaymentRequest(payload.Data.ClientReference, payload.Data.TransactionId, 
