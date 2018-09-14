@@ -50,8 +50,8 @@ namespace Hubtel.PaymentProxy.Models.Dtos
 
         public bool IsReturn { get; set; }
 
-        [StringLength(40)]
-        public string OfflineGuid { get; set; }
+        //[StringLength(40)]
+        //public string OfflineGuid { get; set; }
 
         public virtual ICollection<OrderItemDto> OrderItems { get; set; }
 

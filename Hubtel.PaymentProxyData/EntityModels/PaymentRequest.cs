@@ -57,8 +57,8 @@ namespace Hubtel.PaymentProxyData.EntityModels
 
         public string ReceiptNumber { get; set; }
 
-        [StringLength(50)]
-        public string OfflineGuid { get; set; }
+        //[StringLength(50)]
+        //public string OfflineGuid { get; set; }
 
         [MaxLength(255)]
         public string ClientReference { get; set; }

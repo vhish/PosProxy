@@ -53,7 +53,7 @@ namespace Hubtel.PaymentProxy.Models.Dtos
 
         public string ReceiptNumber { get; set; }
 
-        [StringLength(40)]
-        public string OfflineGuid { get; set; }
+        //[StringLength(40)]
+        //public string OfflineGuid { get; set; }
     }
 }

@@ -16,7 +16,7 @@ namespace Hubtel.PaymentProxy.IntegrationTest.Data
             EmployeeId = "024377919",
             EmployeeName = "George Hagan",
             IntegrationChannel = "InStore",
-            OfflineGuid = Guid.NewGuid().ToString(),
+            OrderNumber = Guid.NewGuid().ToString("N"),
             PosDeviceId = "1",
             TotalAmountDue = 108.00M,
             OrderItems = new List<OrderItemDto>
@@ -38,7 +38,7 @@ namespace Hubtel.PaymentProxy.IntegrationTest.Data
                 PaymentType = "MOMO",
                 PosDeviceId = "12345",
                 AmountPaid = 108.00M,
-                OfflineGuid = Guid.NewGuid().ToString()
+                ReceiptNumber = Guid.NewGuid().ToString("N")
             }
         };
 
@@ -51,7 +51,7 @@ namespace Hubtel.PaymentProxy.IntegrationTest.Data
             EmployeeId = "024377919",
             EmployeeName = "George Hagan",
             IntegrationChannel = "InStore",
-            OfflineGuid = Guid.NewGuid().ToString(),
+            OrderNumber = Guid.NewGuid().ToString("N"),
             PosDeviceId = "1",
             TotalAmountDue = 108.00M,
             OrderItems = new List<OrderItemDto>
