@@ -55,13 +55,13 @@ namespace Hubtel.PaymentProxy.BackgroundServices
                         var paymentRequests = FetchPendingPaymentRequests(db, paymentTypes);
                         if (paymentRequests != null && paymentRequests.Any())
                         {
-                            //var processPaymentTasks = new List<Task>();
+                            var processPaymentTasks = new List<Task>();
                             foreach (var paymentRequest in paymentRequests)
                             {
-                                //processPaymentTasks.Add(CheckStatusAsync(paymentRequest));
-                                CheckStatusAsync(paymentRequest).Wait();
+                                processPaymentTasks.Add(CheckStatusAsync(paymentRequest));
+                                //CheckStatusAsync(paymentRequest).Wait();
                             }
-                            //Task.WaitAll(processPaymentTasks.ToArray());
+                            Task.WaitAll(processPaymentTasks.ToArray());
                         }
                     }
                     catch (Exception e)
