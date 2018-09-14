@@ -26,6 +26,10 @@ namespace Hubtel.PaymentProxy.Filters
         {
             var remoteIpAddress = context.HttpContext.Connection.RemoteIpAddress.ToString();
             var ipAddressPool = _merchantAccountConfiguration.IpAddressPool.Split(';').Select(x => x.Trim()).ToList();
+
+            Console.WriteLine(remoteIpAddress);
+            Console.WriteLine(ipAddressPool);
+
             if (!ipAddressPool.Contains(remoteIpAddress))
             {
                 context.Result = new JsonResult(new { HttpStatusCode.Forbidden });
