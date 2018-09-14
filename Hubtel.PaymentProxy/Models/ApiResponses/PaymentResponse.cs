@@ -7,9 +7,9 @@ namespace Hubtel.PaymentProxy.Models.ApiResponses
 {
     public class PaymentResponse
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string PaymentType { get; set; }
-        public Guid? OrderId { get; set; }
+        public string OrderId { get; set; }
         public string MomoPhoneNumber { get; set; }
         public string MomoChannel { get; set; }
         public string MomoToken { get; set; }

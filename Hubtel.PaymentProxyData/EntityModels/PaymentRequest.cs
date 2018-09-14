@@ -11,7 +11,7 @@ namespace Hubtel.PaymentProxyData.EntityModels
     {
         public string PaymentType { get; set; }
 
-        public Guid? OrderId { get; set; }
+        public string OrderId { get; set; }
 
         public string MomoPhoneNumber { get; set; }
 

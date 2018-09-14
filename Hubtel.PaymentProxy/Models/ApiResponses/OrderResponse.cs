@@ -15,7 +15,7 @@ namespace Hubtel.PaymentProxy.Models.ApiResponses
 
     public class OrderResponse
     {
-        public Guid Id { get; set; }
+        public string Id { get; set; }
         public string IntegrationChannel { get; set; }
         public string PosDeviceId { get; set; }
         public string PosDeviceType { get; set; }
