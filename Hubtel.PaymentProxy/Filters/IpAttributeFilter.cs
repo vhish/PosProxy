@@ -27,8 +27,8 @@ namespace Hubtel.PaymentProxy.Filters
             var remoteIpAddress = context.HttpContext.Connection.RemoteIpAddress.ToString();
             var ipAddressPool = _merchantAccountConfiguration.IpAddressPool.Split(';').Select(x => x.Trim()).ToList();
 
-            Console.WriteLine(remoteIpAddress);
-            Console.WriteLine(ipAddressPool);
+            Console.WriteLine("Remote IP Address: [" + remoteIpAddress + "]");
+            Console.WriteLine("IP Address Pool: [" + ipAddressPool + "]");
 
             if (!ipAddressPool.Contains(remoteIpAddress))
             {
