@@ -57,7 +57,7 @@ namespace Hubtel.PaymentProxy.Services
             {
                 MobileNumber = mnp.InternationalFormat.Replace("+", ""),
                 NetworkCode = mnp.CurrentCarrier.NetworkCode,
-                Name = mnp.CurrentCarrier.Name,
+                NetworkName = mnp.CurrentCarrier.Name,
                 WalletName = await nameResultTask,
                 Channel = _paymentTypeConfiguration.Channels.FirstOrDefault(x => x.NetworkCode == mnp.CurrentCarrier.NetworkCode)?.Name
             };

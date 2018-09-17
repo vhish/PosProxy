@@ -23,14 +23,14 @@ namespace Hubtel.PaymentProxy.Models.Dtos
 
     public class MnpData
     {
-        public string Name { get; set; }
+        public string NetworkName { get; set; }
         public string NetworkCode { get; set; }
         public string Channel { get; set; }
         public string Ported { get; set; }
         public string MobileNumber { get; set; }
         public string WalletName { get; set; }
-        public string Code { get; set; }
-        public string FailedMessage { get; set; }
+        //public string Code { get; set; }
+        //public string FailedMessage { get; set; }
     }
 
     /*public class Customer
